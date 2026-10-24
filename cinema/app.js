@@ -214,10 +214,6 @@ function renderCatalog() {
       banner.className = "poster";
       banner.append(posterImage(item));
 
-      const icon = document.createElement("span");
-      icon.textContent = topic.icon;
-      icon.hidden = true;
-      banner.append(icon);
 
       const body = document.createElement("div");
       body.className = "product__body";
