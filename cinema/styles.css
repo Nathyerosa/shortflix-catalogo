@@ -450,3 +450,66 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+/* Fixed, centered poster frames keep every catalogue row aligned. */
+.catalog {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 220px));
+  justify-content: center;
+  align-items: stretch;
+}
+.product__button {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.poster {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #111318;
+  flex: none;
+}
+.poster img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.product__body {
+  width: 100%;
+}
+.product h3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  height: 2.44em;
+  min-height: 0;
+  overflow: hidden;
+}
+.details__banner {
+  position: relative;
+  display: block;
+  aspect-ratio: 2 / 3;
+  min-height: 0;
+  max-height: 60vh;
+  padding: 0;
+  overflow: hidden;
+  background: #111318;
+}
+.details__banner img {
+  position: absolute;
+  inset: 0;
+  object-fit: contain;
+  object-position: center;
+}
+@media (max-width: 640px) {
+  .catalog {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
