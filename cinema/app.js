@@ -2,12 +2,10 @@ const BOT_USERNAME = "ShortFlix_Cinema_bot";
 
 const topics = [
   { id: "all", label: "Todos", icon: "✨" },
-  { id: "filmes-dublados", label: "Filmes Dublados", icon: "F" },
-  { id: "filmes-legendados", label: "Filmes legendados", icon: "F" },
+  { id: "filmes", label: "Filmes", icon: "F" },
+  { id: "series", label: "Séries", icon: "S" },
   { id: "novelas-turcas", label: "Novelas Turcas", icon: "N" },
-    { id: "doramas", label: "Doramas", icon: "D" },
-  { id: "series-legendadas", label: "Séries legendadas", icon: "S" },
-  { id: "series-dubladas", label: "Séries dubladas", icon: "S" },
+  { id: "doramas", label: "Doramas", icon: "D" },
 ];
 
 const catalog = [
@@ -87,6 +85,18 @@ function normalize(value) {
   return value.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
+function unifiedTopic(topicId) {
+  if (["filmes-dublados", "filmes-legendados"].includes(topicId)) return "filmes";
+  if (["series-dubladas", "series-legendadas"].includes(topicId)) return "series";
+  return topicId;
+}
+
+function languageLabel(item) {
+  if (/-dublad[oa]s?$/.test(item.topic)) return "Dublado";
+  if (/-legendad[oa]s?$/.test(item.topic)) return "Legendado";
+  return "";
+}
+
 function getTopic(topicId) {
   return topics.find((topic) => topic.id === topicId) || topics[0];
 }
@@ -110,9 +120,9 @@ function filteredCatalog() {
   const query = normalize(searchEl.value.trim());
 
   return catalog.filter((item) => {
-    const topic = getTopic(item.topic);
-    const matchesTopic = selectedTopicId === "all" || item.topic === selectedTopicId;
-    const matchesSearch = normalize(`${item.title} ${item.type} ${topic.label}`).includes(query);
+    const topic = getTopic(unifiedTopic(item.topic));
+    const matchesTopic = selectedTopicId === "all" || unifiedTopic(item.topic) === selectedTopicId;
+    const matchesSearch = normalize(`${item.title} ${item.type} ${topic.label} ${languageLabel(item)}`).includes(query);
     return matchesTopic && matchesSearch;
   });
 }
@@ -140,10 +150,10 @@ function renderTopics() {
 }
 
 function openDetails(item) {
-  const topic = getTopic(item.topic);
+  const topic = getTopic(unifiedTopic(item.topic));
   selectedItem = item;
   detailsBanner.style.setProperty("--banner", item.banner);
-  detailsType.textContent = `${topic.icon} ${topic.label}`;
+  detailsType.textContent = `${topic.icon} ${topic.label}${languageLabel(item) ? " · " + languageLabel(item) : ""}`;
   detailsTitle.textContent = item.title;
   detailsDescription.textContent = item.description;
   detailsPrice.textContent = money(item.price);
@@ -172,7 +182,7 @@ function renderCatalog() {
 
   catalogEl.replaceChildren(
     ...items.map((item) => {
-      const topic = getTopic(item.topic);
+      const topic = getTopic(unifiedTopic(item.topic));
       const card = document.createElement("article");
       card.className = "product";
 
@@ -205,7 +215,7 @@ function renderCatalog() {
 
       const category = document.createElement("p");
       category.className = "product__category";
-      category.textContent = item.type === "filme" ? "Filme" : "Série";
+      category.textContent = (item.type === "filme" ? "Filme" : "Série") + (languageLabel(item) ? " · " + languageLabel(item) : "");
 
       body.append(title, topicName, price, category);
       button.append(banner, body);
