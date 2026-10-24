@@ -8,6 +8,13 @@ const topics = [
   { id: "doramas", label: "Doramas", icon: "D" },
 ];
 
+const categoryPrices = {
+  filmes: 6,
+  series: 8,
+  doramas: 8,
+  "novelas-turcas": 10,
+};
+
 const catalog = [
   {
     id: "sobrenatural-a-origem",
@@ -55,6 +62,11 @@ const catalog = [
     description: "Filme legendado de ação e suspense.",
   },
 ];
+
+// One price per category, including dubbed and subtitled versions.
+for (const item of catalog) {
+  item.price = categoryPrices[unifiedTopic(item.topic)] ?? item.price;
+}
 
 const telegram = window.Telegram?.WebApp;
 const topicPillsEl = document.querySelector("#topic-pills");
