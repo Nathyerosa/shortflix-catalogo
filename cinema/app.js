@@ -130,7 +130,7 @@ function openDetails(item) {
   detailsBanner.replaceChildren(posterImage(item));
   trailerButton.hidden = true;
   buyButton.textContent = "Ver no bot";
-  detailsType.textContent = `${topic.icon} ${topic.label}${languageLabel(item) ? " · " + languageLabel(item) : ""}`;
+  detailsType.textContent = topic.label;
   detailsTitle.textContent = item.title;
   detailsDescription.textContent = item.description;
   detailsPrice.textContent = money(item.price);
