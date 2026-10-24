@@ -513,3 +513,26 @@ button {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Detail view shows the complete original banner without a cropped frame. */
+.details__banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  min-height: 0;
+  max-height: none;
+  padding: 0;
+}
+.details__banner img {
+  position: static;
+  inset: auto;
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none;
+  object-fit: contain !important;
+  object-position: center;
+}
