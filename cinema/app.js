@@ -15,58 +15,7 @@ const categoryPrices = {
   "novelas-turcas": 10,
 };
 
-const catalog = [
-  {
-    id: "sobrenatural-a-origem",
-    type: "filme",
-    topic: "filmes-dublados",
-    title: "Sobrenatural - A Origem",
-    price: 6,
-    banner: "linear-gradient(135deg, #111827, #4c1d95 54%, #020617)",
-    description: "Filme dublado hospedado no tópico Filmes Dublados.",
-  },
-  {
-    id: "amor-em-istambul",
-    type: "serie",
-    topic: "novelas-turcas",
-    title: "Amor em Istambul",
-    price: 10,
-    banner: "linear-gradient(135deg, #9f1239, #312e81 54%, #111827)",
-    description: "Novela turca dublada hospedada no tópico Novelas Turcas.",
-  },
-  {
-    id: "familia-de-ferro",
-    type: "serie",
-    topic: "series-dubladas",
-    title: "Família de Ferro",
-    price: 10,
-    banner: "linear-gradient(135deg, #713f12, #111827 52%, #7f1d1d)",
-    description: "Série dublada completa para maratonar.",
-  },
-  {
-    id: "noites-de-istambul",
-    type: "serie",
-    topic: "series-legendadas",
-    title: "Noites de Istambul",
-    price: 10,
-    banner: "linear-gradient(135deg, #0f766e, #111827 50%, #581c87)",
-    description: "Série legendada com drama, romance e mistério.",
-  },
-  {
-    id: "codigo-sombra",
-    type: "filme",
-    topic: "filmes-legendados",
-    title: "Código Sombra",
-    price: 6,
-    banner: "linear-gradient(135deg, #365314, #111827 55%, #14532d)",
-    description: "Filme legendado de ação e suspense.",
-  },
-];
-
-// One price per category, including dubbed and subtitled versions.
-for (const item of catalog) {
-  item.price = categoryPrices[unifiedTopic(item.topic)] ?? item.price;
-}
+let catalog = [];
 
 const telegram = window.Telegram?.WebApp;
 const topicPillsEl = document.querySelector("#topic-pills");
@@ -88,6 +37,18 @@ const buyButton = document.querySelector("#buy-button");
 
 let selectedTopicId = "all";
 let selectedItem = null;
+let visibleCount = 48;
+let catalogLoadFailed = false;
+const loadMoreButton = document.createElement("button");
+loadMoreButton.type = "button";
+loadMoreButton.className = "secondary-button";
+loadMoreButton.style.cssText = "display:block;margin:24px auto";
+catalogEl.after(loadMoreButton);
+loadMoreButton.addEventListener("click", () => {
+  if (catalogLoadFailed) { loadCatalog(); return; }
+  visibleCount += 48;
+  renderCatalog();
+});
 
 function money(value) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -104,6 +65,7 @@ function unifiedTopic(topicId) {
 }
 
 function languageLabel(item) {
+  if (item.language) return item.language;
   if (/-dublad[oa]s?$/.test(item.topic)) return "Dublado";
   if (/-legendad[oa]s?$/.test(item.topic)) return "Legendado";
   return "";
@@ -141,6 +103,7 @@ function filteredCatalog() {
 
 function selectTopic(topicId) {
   selectedTopicId = topicId;
+  visibleCount = 48;
   render();
 }
 
@@ -164,7 +127,9 @@ function renderTopics() {
 function openDetails(item) {
   const topic = getTopic(unifiedTopic(item.topic));
   selectedItem = item;
-  detailsBanner.style.setProperty("--banner", item.banner);
+  detailsBanner.replaceChildren(posterImage(item));
+  trailerButton.hidden = true;
+  buyButton.textContent = "Ver no bot";
   detailsType.textContent = `${topic.icon} ${topic.label}${languageLabel(item) ? " · " + languageLabel(item) : ""}`;
   detailsTitle.textContent = item.title;
   detailsDescription.textContent = item.description;
@@ -183,17 +148,59 @@ function closeDetails() {
   details.close();
 }
 
+function posterImage(item) {
+  const image = document.createElement("img");
+  image.alt = `Capa de ${item.title}`;
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.style.cssText = "display:block;width:100%;height:100%;object-fit:cover";
+  try {
+    const url = new URL(item.banner);
+    if (url.protocol !== "https:" || url.hostname !== "pub-1cbde0115f1f4e10bfa43910aa240921.r2.dev") throw new Error("Invalid cover");
+    image.src = url.href;
+  } catch { image.hidden = true; }
+  image.addEventListener("error", () => { image.hidden = true; });
+  return image;
+}
+
+async function loadCatalog() {
+  resultCountEl.textContent = "Carregando títulos…";
+  loadMoreButton.hidden = true;
+  emptyEl.hidden = true;
+  try {
+    const response = await fetch("catalog.json?v=cinema-real-1", {cache: "no-cache"});
+    if (!response.ok) throw new Error("Catalogue unavailable");
+    const data = await response.json();
+    if (!Array.isArray(data.items)) throw new Error("Invalid catalogue");
+    catalog = data.items.filter(item => item && /^[a-f0-9]{24}$/.test(item.id) && typeof item.title === "string" && Object.hasOwn(categoryPrices, item.topic)).reverse();
+    for (const item of catalog) item.price = categoryPrices[item.topic];
+    catalogLoadFailed = false;
+    visibleCount = 48;
+    emptyEl.textContent = "Nenhum título encontrado.";
+    render();
+  } catch {
+    catalogLoadFailed = true;
+    resultCountEl.textContent = "Catálogo indisponível no momento.";
+    emptyEl.hidden = false;
+    emptyEl.textContent = "Confira sua conexão e tente novamente.";
+    loadMoreButton.hidden = false;
+    loadMoreButton.textContent = "Tentar novamente";
+  }
+}
+
 function renderCatalog() {
   const items = filteredCatalog();
   const selectedTopic = getTopic(selectedTopicId);
+  loadMoreButton.hidden = visibleCount >= items.length;
+  loadMoreButton.textContent = `Mostrar mais (${Math.min(visibleCount, items.length)} de ${items.length})`;
 
   sectionTitleEl.textContent = selectedTopic.label;
-  launchHeadingEl.hidden = selectedTopicId !== "all";
+  launchHeadingEl.hidden = true;
   resultCountEl.textContent = `${items.length} título(s) encontrado(s)`;
   emptyEl.hidden = items.length > 0;
 
   catalogEl.replaceChildren(
-    ...items.map((item) => {
+    ...items.slice(0, visibleCount).map((item) => {
       const topic = getTopic(unifiedTopic(item.topic));
       const card = document.createElement("article");
       card.className = "product";
@@ -205,10 +212,11 @@ function renderCatalog() {
 
       const banner = document.createElement("div");
       banner.className = "poster";
-      banner.style.setProperty("--banner", item.banner);
+      banner.append(posterImage(item));
 
       const icon = document.createElement("span");
       icon.textContent = topic.icon;
+      icon.hidden = true;
       banner.append(icon);
 
       const body = document.createElement("div");
@@ -242,7 +250,7 @@ function render() {
   renderCatalog();
 }
 
-searchEl.addEventListener("input", renderCatalog);
+searchEl.addEventListener("input", () => { visibleCount = 48; renderCatalog(); });
 closeDetailsButton.addEventListener("click", closeDetails);
 details.addEventListener("click", (event) => {
   if (event.target === details) {
@@ -267,4 +275,5 @@ if (telegram) {
   telegram.setBackgroundColor("#fff6f7");
 }
 
-render();
+renderTopics();
+loadCatalog();
