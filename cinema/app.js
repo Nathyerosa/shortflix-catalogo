@@ -124,6 +124,16 @@ function renderTopics() {
   );
 }
 
+function synopsisWithoutTitle(item) {
+  const lines = String(item.description || "").trim().split(/\r?\n/);
+  const titleKey = value => normalize(String(value))
+    .replace(/^[^\p{L}\p{N}]+/u, "")
+    .replace(/^(?:serie|filme|dorama|novela)(?:\s+turca)?(?:\s+(?:dublad[oa]|legendad[oa]))?\s*:\s*/, "")
+    .replace(/\s+/g, " ").trim();
+  if (lines.length && titleKey(lines[0]) === titleKey(item.title)) lines.shift();
+  return lines.join("\n").trim();
+}
+
 function openDetails(item) {
   const topic = getTopic(unifiedTopic(item.topic));
   selectedItem = item;
@@ -132,7 +142,8 @@ function openDetails(item) {
   buyButton.textContent = "Ver no bot";
   detailsType.textContent = topic.label;
   detailsTitle.textContent = item.title;
-  detailsDescription.textContent = item.description;
+  detailsDescription.textContent = synopsisWithoutTitle(item);
+  detailsDescription.hidden = !detailsDescription.textContent;
   detailsPrice.textContent = money(item.price);
 
   if (typeof details.showModal === "function") {
