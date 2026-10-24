@@ -3,10 +3,11 @@ const BOT_USERNAME = "ShortFlix_Cinema_bot";
 const topics = [
   { id: "all", label: "Todos", icon: "✨" },
   { id: "filmes-dublados", label: "Filmes Dublados", icon: "F" },
+  { id: "filmes-legendados", label: "Filmes legendados", icon: "F" },
   { id: "novelas-turcas", label: "Novelas Turcas", icon: "N" },
+    { id: "doramas", label: "Doramas", icon: "D" },
   { id: "series-legendadas", label: "Séries legendadas", icon: "S" },
   { id: "series-dubladas", label: "Séries dubladas", icon: "S" },
-  { id: "filmes-legendados", label: "Filmes legendados", icon: "F" },
 ];
 
 const catalog = [
