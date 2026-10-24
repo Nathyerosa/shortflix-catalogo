@@ -2,10 +2,10 @@ const BOT_USERNAME = "ShortFlix_Cinema_bot";
 
 const topics = [
   { id: "all", label: "Todos", icon: "✨" },
-  { id: "filmes", label: "Filmes", icon: "F" },
-  { id: "series", label: "Séries", icon: "S" },
-  { id: "novelas-turcas", label: "Novelas Turcas", icon: "N" },
-  { id: "doramas", label: "Doramas", icon: "D" },
+  { id: "filmes", label: "Filmes" },
+  { id: "series", label: "Séries" },
+  { id: "novelas-turcas", label: "Novelas Turcas" },
+  { id: "doramas", label: "Doramas" },
 ];
 
 const categoryPrices = {
