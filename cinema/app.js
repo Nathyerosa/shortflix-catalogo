@@ -131,7 +131,11 @@ function synopsisWithoutTitle(item) {
     .replace(/^(?:serie|filme|dorama|novela)(?:\s+turca)?(?:\s+(?:dublad[oa]|legendad[oa]))?\s*:\s*/, "")
     .replace(/\s+/g, " ").trim();
   if (lines.length && titleKey(lines[0]) === titleKey(item.title)) lines.shift();
-  return lines.join("\n").trim();
+  let description = lines.join("\n").trim();
+  if (item.type === "serie") {
+    description = description.replace(/^((?:\d+[ªº]?\s+temporadas?\s*[-–—:]\s*)?\d+\s+epis[oó]dios?)[ \t]+(?=\S)/gim, "$1\n\n");
+  }
+  return description;
 }
 
 function openDetails(item) {
@@ -143,6 +147,7 @@ function openDetails(item) {
   detailsType.textContent = topic.label;
   detailsTitle.textContent = item.title;
   detailsDescription.textContent = synopsisWithoutTitle(item);
+  detailsDescription.style.whiteSpace = item.type === "serie" ? "pre-line" : "normal";
   detailsDescription.hidden = !detailsDescription.textContent;
   detailsPrice.textContent = money(item.price);
 
