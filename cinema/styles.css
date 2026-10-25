@@ -536,3 +536,67 @@ button {
   object-fit: contain !important;
   object-position: center;
 }
+
+/* Overlay details and purchase action on the lower part of the full poster. */
+.details {
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+}
+.details__panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  height: min(780px, 138vw, calc(100dvh - 32px));
+  overflow: hidden;
+}
+.details__banner {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: auto;
+}
+.details__banner img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center;
+}
+.details__body {
+  grid-area: 1 / 1;
+  align-self: end;
+  z-index: 1;
+  min-width: 0;
+  min-height: 0;
+  max-height: 80%;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  gap: 10px;
+  padding: 60px 20px 20px;
+  background: linear-gradient(to bottom, transparent, rgb(8 10 14 / 86%) 20%, rgb(8 10 14 / 98%) 72%);
+}
+.details__body #details-description {
+  min-height: 0;
+  max-height: min(18dvh, 150px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: #e0e2e8;
+  text-shadow: 0 1px 3px #000;
+}
+.details__body h2 {
+  font-size: clamp(20px, 4.8vw, 26px);
+  text-shadow: 0 2px 5px #000;
+}
+.details__actions {
+  grid-template-columns: minmax(0, 1fr);
+}
+.details__actions button {
+  width: 100%;
+  min-height: 44px;
+}
+.details__actions button[hidden] {
+  display: none;
+}
+.details__close {
+  z-index: 3;
+}
