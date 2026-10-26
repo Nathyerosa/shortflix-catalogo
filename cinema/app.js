@@ -143,7 +143,7 @@ function openDetails(item) {
   selectedItem = item;
   detailsBanner.replaceChildren(posterImage(item));
   trailerButton.hidden = true;
-  buyButton.textContent = "Ver no bot";
+  buyButton.textContent = telegram?.initData ? "Comprar com Pix" : "Abrir no Telegram";
   detailsType.textContent = topic.label;
   detailsTitle.textContent = item.title;
   detailsDescription.textContent = synopsisWithoutTitle(item);
@@ -194,6 +194,12 @@ async function loadCatalog() {
     visibleCount = 48;
     emptyEl.textContent = "Nenhum título encontrado.";
     render();
+    const startParam = telegram?.initDataUnsafe?.start_param
+      || new URLSearchParams(window.location.search).get("tgWebAppStartParam");
+    if (telegram?.initData && /^titulo_[a-f0-9]{24}$/.test(startParam || "")) {
+      const linkedItem = catalog.find(item => item.id === startParam.slice(7));
+      if (linkedItem) openDetails(linkedItem);
+    }
   } catch {
     catalogLoadFailed = true;
     resultCountEl.textContent = "Catálogo indisponível no momento.";
@@ -362,7 +368,7 @@ async function updateCheckout(create) {
 function startCheckout(item) {
   if (checkoutBusy) return;
   if (!telegram?.initData) {
-    window.alert("Abra o catálogo pelo Mini App do Telegram para comprar.");
+    window.location.assign(`https://t.me/${BOT_USERNAME}?startapp=${encodeURIComponent(`titulo_${item.id}`)}`);
     return;
   }
   details.close();
