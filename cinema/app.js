@@ -276,7 +276,7 @@ trailerButton.addEventListener("click", () => {
 });
 buyButton.addEventListener("click", () => {
   if (selectedItem) {
-    openTelegram(`comprar_${selectedItem.id}`);
+    startCheckout(selectedItem);
   }
 });
 
@@ -289,3 +289,99 @@ if (telegram) {
 
 renderTopics();
 loadCatalog();
+
+
+// Credentials and prices are validated by the server.
+const CHECKOUT_API_BASE = "https://api.shortflix.com.br/";
+const checkoutDialog = document.createElement("dialog");
+checkoutDialog.className = "details checkout";
+checkoutDialog.innerHTML = `<div class="details__panel"><div class="details__body">
+  <button type="button" id="checkout-close" class="secondary-button">Voltar ao catálogo</button>
+  <h2>Pagamento com Pix</h2><p id="checkout-title"></p>
+  <strong id="checkout-total" class="details__price"></strong>
+  <p id="checkout-status" role="status" aria-live="polite"></p>
+  <img id="checkout-qr" alt="QR Code do Pix" hidden />
+  <textarea id="checkout-code" readonly aria-label="Código Pix" hidden></textarea>
+  <button id="checkout-copy" class="primary-button" type="button" hidden>Copiar código Pix</button>
+  <button id="checkout-check" class="secondary-button" type="button" hidden>Já paguei, verificar pagamento</button>
+  <button id="checkout-retry" class="secondary-button" type="button" hidden>Tentar novamente</button>
+  <p>A entrega será enviada pela conversa do bot após a confirmação.</p>
+</div></div>`;
+document.body.append(checkoutDialog);
+const checkoutEl = (id) => checkoutDialog.querySelector(`#checkout-${id}`);
+let checkoutOrder = null;
+let checkoutProduct = null;
+let checkoutBusy = false;
+checkoutEl("close").onclick = () => checkoutDialog.close();
+
+async function checkoutRequest(path, body) {
+  const response = await fetch(new URL(path, CHECKOUT_API_BASE), {
+    method: body ? "POST" : "GET",
+    headers: { "Content-Type": "application/json", "X-Telegram-Init-Data": telegram.initData },
+    body: body ? JSON.stringify(body) : undefined,
+    cache: "no-store",
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || "Pagamento indisponível. Tente novamente.");
+  return result;
+}
+
+function showCheckoutOrder(order) {
+  checkoutOrder = order;
+  checkoutEl("title").textContent = order.title;
+  checkoutEl("total").textContent = money(order.amount_cents / 100);
+  checkoutEl("status").textContent = order.status;
+  const pending = order.state === "pending";
+  checkoutEl("qr").hidden = !pending || !order.qr_image;
+  if (pending && order.qr_image) checkoutEl("qr").src = `data:image/png;base64,${order.qr_image}`;
+  checkoutEl("code").hidden = !pending || !order.pix_code;
+  checkoutEl("code").value = order.pix_code || "";
+  checkoutEl("copy").hidden = !pending || !order.pix_code;
+  checkoutEl("check").hidden = !["pending", "paid"].includes(order.state);
+}
+
+async function updateCheckout(create) {
+  if (checkoutBusy) return;
+  checkoutBusy = true;
+  checkoutEl("retry").hidden = true;
+  checkoutEl("check").disabled = true;
+  checkoutEl("status").textContent = create ? "Gerando Pix…" : "Verificando pagamento…";
+  try {
+    const order = await checkoutRequest(create ? "api/checkout" : `api/checkout/${encodeURIComponent(checkoutOrder.id)}`,
+      create ? { product_id: checkoutProduct.id } : undefined);
+    showCheckoutOrder(order);
+  } catch (error) {
+    checkoutEl("status").textContent = error.message;
+    checkoutEl("retry").hidden = false;
+  } finally {
+    checkoutBusy = false;
+    checkoutEl("check").disabled = false;
+  }
+}
+
+function startCheckout(item) {
+  if (checkoutBusy) return;
+  if (!telegram?.initData) {
+    window.alert("Abra o catálogo pelo Mini App do Telegram para comprar.");
+    return;
+  }
+  details.close();
+  checkoutOrder = null;
+  checkoutProduct = item;
+  checkoutEl("title").textContent = item.title;
+  checkoutEl("total").textContent = "";
+  for (const id of ["qr", "code", "copy", "check", "retry"]) checkoutEl(id).hidden = true;
+  checkoutDialog.showModal();
+  updateCheckout(true);
+}
+checkoutEl("check").onclick = () => updateCheckout(false);
+checkoutEl("retry").onclick = () => updateCheckout(!checkoutOrder);
+checkoutEl("copy").onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(checkoutEl("code").value);
+    checkoutEl("status").textContent = "Código Pix copiado.";
+  } catch {
+    checkoutEl("code").select();
+    checkoutEl("status").textContent = "Selecione e copie o código Pix acima.";
+  }
+};

@@ -600,3 +600,9 @@ button {
 .details__close {
   z-index: 3;
 }
+
+.checkout { max-width: 440px; width: calc(100% - 24px); }
+.checkout .details__body { display: grid; gap: 14px; }
+.checkout #checkout-qr { width: min(100%, 280px); margin: auto; background: white; border-radius: 16px; padding: 12px; }
+.checkout textarea { width: 100%; min-height: 72px; box-sizing: border-box; overflow-wrap: anywhere; }
+.checkout [hidden] { display: none !important; }
