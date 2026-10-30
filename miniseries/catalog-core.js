@@ -1,7 +1,7 @@
 export const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR").trim();
 export const money = value => Number(value).toLocaleString("pt-BR", {style:"currency",currency:"BRL"});
 export function prepareIndex(items) {
-  return items.map(item => ({...item, search: normalize([item.title, ...(item.aliases || [])].join(" "))}));
+  return items.map((item, position) => ({...item, catalogOrder: Number.isSafeInteger(item.catalogOrder) && item.catalogOrder > 0 ? item.catalogOrder : position + 1, search: normalize([item.title, ...(item.aliases || [])].join(" "))})).sort((a,b) => b.catalogOrder - a.catalogOrder);
 }
 export function filterIndex(items, query, language, genre="all", origin="all") {
   const tokens = normalize(query).split(/\s+/).filter(Boolean);
