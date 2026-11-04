@@ -1,14 +1,20 @@
 {
   "schemaVersion": 1,
   "overrides": {
+    "mini_2177ae3ee2af": "dublado",
     "mini_25b98282c6f2": "dublado",
     "mini_28402c537447": "dublado",
     "mini_2854f654fb47": "dublado",
+    "mini_343423d3f3eb": "dublado",
     "mini_4034c3d061d3": "dublado",
     "mini_5f6003b43282": "dublado",
     "mini_6c4d531ba88d": "legendado",
     "mini_82fee92bd12c": "legendado",
     "mini_8e40be5e6346": "dublado",
+    "mini_917425793d27": "dublado",
+    "mini_9ef008e4ee9d": "legendado",
+    "mini_aec30592010b": "legendado",
+    "mini_ca1498459797": "legendado",
     "mini_f9392abc3e69": "dublado",
     "mini_ffcabe614ffd": "dublado"
   },
@@ -41,6 +47,7 @@
     "mini_5f6003b43282": "O CHEFE DA FAVELA",
     "mini_82fee92bd12c": "NOIVO TROCADO: CASEI COM UM CHEFÃO DA MÁFIA",
     "mini_8e40be5e6346": "A ENCANTADORA DE BEBÊS DO ALFA",
+    "mini_917425793d27": "DEPOIS DE FICAR CEGA, DORMI COM O MELHOR AMIGO DO MEU NAMORADO",
     "mini_f9392abc3e69": "DEPOIS DO DIVÓRCIO CASEI COM O CHEFÃO E TIVE QUATRO FILHOS"
   },
   "excluded": {
