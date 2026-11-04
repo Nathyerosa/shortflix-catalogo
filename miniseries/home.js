@@ -16,7 +16,7 @@ export function createHome({getManifest, loadPage, createPoster}) {
   const stage = $("#home-feature");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let items = [], selected = 0, ready = false, loading = null;
-  let paused = reducedMotion.matches, hovered = false, timer = null;
+  let paused = reducedMotion.matches, timer = null;
   function updatePause() {
     const button = $("#home-pause");
     button.textContent = paused ? "▶" : "Ⅱ";
@@ -95,23 +95,28 @@ export function createHome({getManifest, loadPage, createPoster}) {
     if(announce) {const status = $("#home-status"); status.textContent = item.title;}
   }
   function canRotate() {
-    return ready && !paused && !hovered && !document.hidden && !$("#home").hidden && !root.contains(document.activeElement);
+    return ready && items.length>1 && !paused && !document.hidden && !$("#home").hidden && !root.contains(document.activeElement);
   }
   function resetTimer() {
     clearInterval(timer);
     timer = setInterval(() => {if(canRotate()) display(selected + 1);}, 3000);
   }
-  function navigate(number) {if(!ready) return; display(number, true); resetTimer();}
-  $("#home-prev").onclick = () => navigate(selected - 1);
-  $("#home-next").onclick = () => navigate(selected + 1);
+  function navigate(number,event) {
+    if(!ready) return;
+    display(number, true);
+    // A pointer click must not leave a dot focused and stop autoplay indefinitely.
+    // Keyboard focus still pauses rotation while someone uses the controls.
+    if(event?.detail>0 && root.contains(document.activeElement))document.activeElement.blur();
+    resetTimer();
+  }
+  $("#home-prev").onclick = event => navigate(selected - 1,event);
+  $("#home-next").onclick = event => navigate(selected + 1,event);
   $("#home-pause").onclick = () => {paused = !paused; updatePause(); resetTimer();};
-  root.addEventListener("mouseenter", () => {hovered = true;});
-  root.addEventListener("mouseleave", () => {hovered = false;});
   root.addEventListener("keydown", event => {
     if(event.key === "ArrowRight" || event.key === "ArrowLeft") {event.preventDefault(); navigate(selected + (event.key === "ArrowRight" ? 1 : -1));}
   });
   let touch = null;
-  stage.addEventListener("touchstart", event => {const p=event.changedTouches[0]; touch={x:p.clientX,y:p.clientY};hovered=false;}, {passive:true});
+  stage.addEventListener("touchstart", event => {const p=event.changedTouches[0]; touch={x:p.clientX,y:p.clientY};}, {passive:true});
   stage.addEventListener("touchcancel", () => {touch=null;}, {passive:true});
   stage.addEventListener("touchend", event => {
     if(!touch) return;const p=event.changedTouches[0], dx=p.clientX-touch.x,dy=p.clientY-touch.y;touch=null;
@@ -191,7 +196,7 @@ export function createHome({getManifest, loadPage, createPoster}) {
       } catch(error) {console.warn("Seleção da Home indisponível; mantendo apresentação padrão.");}
       populateShelf("home-more", trending);
       const dots=$("#home-dots");dots.replaceChildren();
-      items.forEach((item,i)=>{const dot=document.createElement("button");dot.type="button";dot.setAttribute("aria-label",`Mostrar história ${i+1}: ${item.title}`);dot.onclick=()=>navigate(i);dots.append(dot);});
+      items.forEach((item,i)=>{const dot=document.createElement("button");dot.type="button";dot.setAttribute("aria-label",`Mostrar história ${i+1}: ${item.title}`);dot.onclick=event=>navigate(i,event);dots.append(dot);});
       ready=true;display(0);updatePause();$("#home-controls").hidden=items.length<2;resetTimer();
     })().catch(failure).finally(()=>{loading=null;});
     return loading;
