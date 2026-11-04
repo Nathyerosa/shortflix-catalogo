@@ -1,6 +1,6 @@
 import {normalize, money, prepareIndex, filterIndex, telegramUrl, whatsappUrl, bannerUrl, languageLabel,catalogDataPath} from "./catalog-core.js?v=20261030-recent";
 import {createHome} from "./home.js?v=editor-hero-7a4baf5938a1";
-import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js";
+import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js?v=catalog-exclusions-e0dad42ebf6d";
 const $ = selector => document.querySelector(selector);
 const BATCH = 36;
 let index = null, byId = null, indexPromise = null, manifestPromise = null;
