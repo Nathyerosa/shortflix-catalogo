@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "overrides": {
+    "mini_1736a7a80133": "legendado",
     "mini_2177ae3ee2af": "dublado",
     "mini_25b98282c6f2": "dublado",
     "mini_28402c537447": "dublado",
     "mini_2854f654fb47": "dublado",
     "mini_343423d3f3eb": "dublado",
+    "mini_394ca7d1ca50": "legendado",
     "mini_4034c3d061d3": "dublado",
+    "mini_43eaf1ebd660": "legendado",
     "mini_5f6003b43282": "dublado",
     "mini_6c4d531ba88d": "legendado",
     "mini_82fee92bd12c": "legendado",
@@ -15,7 +18,10 @@
     "mini_9ef008e4ee9d": "legendado",
     "mini_aec30592010b": "legendado",
     "mini_ca1498459797": "legendado",
+    "mini_e05da62f9937": "legendado",
     "mini_f9392abc3e69": "dublado",
+    "mini_f9df12206260": "dublado",
+    "mini_fc2571cc2fd9": "legendado",
     "mini_ffcabe614ffd": "dublado"
   },
   "previews": {
