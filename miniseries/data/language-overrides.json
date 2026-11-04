@@ -1,16 +1,19 @@
 {
   "schemaVersion": 1,
   "overrides": {
+    "mini_25b98282c6f2": "dublado",
     "mini_28402c537447": "dublado",
     "mini_2854f654fb47": "dublado",
     "mini_4034c3d061d3": "dublado",
     "mini_5f6003b43282": "dublado",
+    "mini_6c4d531ba88d": "legendado",
     "mini_82fee92bd12c": "legendado",
     "mini_8e40be5e6346": "dublado",
     "mini_f9392abc3e69": "dublado",
     "mini_ffcabe614ffd": "dublado"
   },
   "previews": {
+    "mini_25b98282c6f2": "https://t.me/dramashortflix/3400",
     "mini_2854f654fb47": "https://t.me/dramashortflix/3290",
     "mini_4034c3d061d3": "https://t.me/dramashortflix/3394",
     "mini_5f6003b43282": "https://t.me/dramashortflix/3304",
@@ -18,6 +21,10 @@
     "mini_ffcabe614ffd": "https://t.me/dramashortflix/3398"
   },
   "genres": {
+    "mini_25b98282c6f2": [
+      "Ação",
+      "Drama e Romance"
+    ],
     "mini_2854f654fb47": [
       "Drama Romântico"
     ],
