@@ -6,13 +6,16 @@
     "mini_4034c3d061d3": "dublado",
     "mini_5f6003b43282": "dublado",
     "mini_82fee92bd12c": "legendado",
-    "mini_f9392abc3e69": "dublado"
+    "mini_8e40be5e6346": "dublado",
+    "mini_f9392abc3e69": "dublado",
+    "mini_ffcabe614ffd": "dublado"
   },
   "previews": {
     "mini_2854f654fb47": "https://t.me/dramashortflix/3290",
     "mini_4034c3d061d3": "https://t.me/dramashortflix/3394",
     "mini_5f6003b43282": "https://t.me/dramashortflix/3304",
-    "mini_ff7412a808db": "https://t.me/dramashortflix/3348"
+    "mini_ff7412a808db": "https://t.me/dramashortflix/3348",
+    "mini_ffcabe614ffd": "https://t.me/dramashortflix/3398"
   },
   "genres": {
     "mini_2854f654fb47": [
@@ -29,6 +32,10 @@
     "mini_4034c3d061d3": "DEZ ANOS DE ESPERA A FILHA XXL DO DOM EMBARCOU COM OUTRO",
     "mini_5f6003b43282": "O CHEFE DA FAVELA",
     "mini_82fee92bd12c": "NOIVO TROCADO: CASEI COM UM CHEFÃO DA MÁFIA",
+    "mini_8e40be5e6346": "A ENCANTADORA DE BEBÊS DO ALFA",
     "mini_f9392abc3e69": "DEPOIS DO DIVÓRCIO CASEI COM O CHEFÃO E TIVE QUATRO FILHOS"
+  },
+  "excluded": {
+    "mini_8e40be5e6346": true
   }
 }
