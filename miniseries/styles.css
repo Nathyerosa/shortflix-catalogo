@@ -3,3 +3,17 @@
 main:focus{outline:none}
 
 .detail .detail-genres{margin-top:14px}
+
+.series-dialog{position:fixed;padding:0;border:1px solid var(--line);background:var(--panel);color:var(--text);overflow:auto}
+.series-dialog .close{width:40px;height:40px;border:1px solid #ffffff40;border-radius:50%;background:#0c0e17d9;color:white;font-size:28px;cursor:pointer}
+.series-dialog{width:calc(100% - 32px);max-width:520px;max-height:92dvh;border-radius:18px;overscroll-behavior:contain;scrollbar-width:thin;box-shadow:0 24px 90px #0009}
+.series-dialog::backdrop{background:#03050bd6;backdrop-filter:blur(6px)}
+#close-series{position:sticky;top:12px;right:auto;display:block;margin:12px 12px -52px auto;z-index:3;flex-shrink:0}
+.series-dialog .detail{display:block;padding:0;margin:0;gap:0}
+.series-dialog .detail>.poster{display:block;width:100%;max-width:none;height:clamp(230px,43dvh,410px);aspect-ratio:auto;margin:0;border-radius:0;position:relative}
+.series-dialog .detail>.poster img{width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+.series-dialog .detail>.poster::after{content:"";position:absolute;inset:auto 0 0;height:100px;background:linear-gradient(transparent,var(--panel));pointer-events:none}
+.series-info{padding:22px 24px 26px}.series-info h2{font-size:25px;line-height:1.2;letter-spacing:-.5px;margin:10px 0 16px}.series-info .eyebrow{font-size:10px;margin-bottom:8px}
+.series-info .detail-price{display:block;font-size:24px;margin:20px 0 16px}.series-info .actions{display:grid;max-width:none;gap:10px;margin-top:16px}.series-info .actions .button{width:100%;min-height:48px;text-align:center}
+.series-info .detail-note{font-size:12px;line-height:1.65;margin:18px 0 0}.series-info .detail-genres{font-size:13px}
+@media(max-width:600px){.series-dialog{width:calc(100% - 20px);max-height:94dvh;border-radius:15px}.series-info{padding:20px}.series-info h2{font-size:22px}.series-dialog .detail>.poster{height:38dvh;min-height:220px}}
