@@ -2,20 +2,27 @@
   "schemaVersion": 1,
   "overrides": {
     "mini_2854f654fb47": "dublado",
-    "mini_4034c3d061d3": "dublado"
+    "mini_4034c3d061d3": "dublado",
+    "mini_5f6003b43282": "dublado"
   },
   "previews": {
     "mini_2854f654fb47": "https://t.me/dramashortflix/3290",
     "mini_4034c3d061d3": "https://t.me/dramashortflix/3394",
+    "mini_5f6003b43282": "https://t.me/dramashortflix/3304",
     "mini_ff7412a808db": "https://t.me/dramashortflix/3348"
   },
   "genres": {
     "mini_2854f654fb47": [
       "Drama Romântico"
+    ],
+    "mini_5f6003b43282": [
+      "Drama",
+      "Romance e Ação"
     ]
   },
   "titles": {
     "mini_2854f654fb47": "VOTOS DESPEDAÇADOS",
-    "mini_4034c3d061d3": "DEZ ANOS DE ESPERA A FILHA XXL DO DOM EMBARCOU COM OUTRO"
+    "mini_4034c3d061d3": "DEZ ANOS DE ESPERA A FILHA XXL DO DOM EMBARCOU COM OUTRO",
+    "mini_5f6003b43282": "O CHEFE DA FAVELA"
   }
 }
