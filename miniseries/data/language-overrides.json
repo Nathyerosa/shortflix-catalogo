@@ -1,9 +1,11 @@
 {
   "schemaVersion": 1,
   "overrides": {
+    "mini_28402c537447": "dublado",
     "mini_2854f654fb47": "dublado",
     "mini_4034c3d061d3": "dublado",
     "mini_5f6003b43282": "dublado",
+    "mini_82fee92bd12c": "legendado",
     "mini_f9392abc3e69": "dublado"
   },
   "previews": {
@@ -22,9 +24,11 @@
     ]
   },
   "titles": {
+    "mini_28402c537447": "NOIVO TROCADO: CASEI COM UM CHEFÃO DA MÁFIA",
     "mini_2854f654fb47": "VOTOS DESPEDAÇADOS",
     "mini_4034c3d061d3": "DEZ ANOS DE ESPERA A FILHA XXL DO DOM EMBARCOU COM OUTRO",
     "mini_5f6003b43282": "O CHEFE DA FAVELA",
+    "mini_82fee92bd12c": "NOIVO TROCADO: CASEI COM UM CHEFÃO DA MÁFIA",
     "mini_f9392abc3e69": "DEPOIS DO DIVÓRCIO CASEI COM O CHEFÃO E TIVE QUATRO FILHOS"
   }
 }
