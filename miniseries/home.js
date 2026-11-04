@@ -173,8 +173,6 @@ export function createHome({getManifest, loadPage, createPoster}) {
       const firstPage=await loadPage(0,info.version);
       if(!Array.isArray(firstPage) || !firstPage.length) throw new Error("Catálogo vazio");
       items=firstPage.slice(0,5);
-      const dots=$("#home-dots");dots.replaceChildren();
-      items.forEach((item,i)=>{const dot=document.createElement("button");dot.type="button";dot.setAttribute("aria-label",`Mostrar história ${i+1}: ${item.title}`);dot.onclick=()=>navigate(i);dots.append(dot);});
       populateShelf("home-featured", firstPage.slice(5,15));
       populateShelf("home-dubbed", firstPage.filter(item => item.languageIsManual?item.language==="dublado":/\bdublad[oa]\b/.test(normalize(item.originalTitle||item.title))).slice(0,10));
       let trending=firstPage.slice(20,30);
@@ -186,10 +184,14 @@ export function createHome({getManifest, loadPage, createPoster}) {
           const entries=config.trending;
           if(entries.some(x=>!/^mini_[a-f0-9]+$/.test(x.id)||!Number.isInteger(x.page)||x.page<0||x.page>=info.pages)||new Set(entries.map(x=>x.id)).size!==entries.length)throw new Error("Seleção inválida");
           const pages=new Map(await Promise.all([...new Set(entries.map(x=>x.page))].map(async n=>[n,n===0?firstPage:await loadPage(n,info.version)])));
-          trending=entries.map(x=>pages.get(x.page).find(item=>item.id===x.id)).filter(Boolean);
+          const selected=entries.map(x=>pages.get(x.page).find(item=>item.id===x.id));
+          if(selected.some(item=>!item))throw new Error("Título selecionado ausente do catálogo");
+          if(selected.length)items=selected;
         }
       } catch(error) {console.warn("Seleção da Home indisponível; mantendo apresentação padrão.");}
       populateShelf("home-more", trending);
+      const dots=$("#home-dots");dots.replaceChildren();
+      items.forEach((item,i)=>{const dot=document.createElement("button");dot.type="button";dot.setAttribute("aria-label",`Mostrar história ${i+1}: ${item.title}`);dot.onclick=()=>navigate(i);dots.append(dot);});
       ready=true;display(0);updatePause();$("#home-controls").hidden=items.length<2;resetTimer();
     })().catch(failure).finally(()=>{loading=null;});
     return loading;

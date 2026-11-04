@@ -1,5 +1,5 @@
 import {normalize, money, prepareIndex, filterIndex, telegramUrl, whatsappUrl, bannerUrl, languageLabel,catalogDataPath} from "./catalog-core.js?v=20261030-recent";
-import {createHome} from "./home.js?v=20261029-novidades";
+import {createHome} from "./home.js?v=editor-hero-14d292b56f52";
 import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js";
 const $ = selector => document.querySelector(selector);
 const BATCH = 36;
