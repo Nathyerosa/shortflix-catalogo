@@ -34,6 +34,7 @@
     "mini_705b01c90aae": "legendado",
     "mini_70f050f7d15c": "legendado",
     "mini_754c3c9a6feb": "legendado",
+    "mini_7616cbb87a67": "legendado",
     "mini_78ae0caaf66c": "legendado",
     "mini_82fee92bd12c": "legendado",
     "mini_8c94bddc4f83": "legendado",
@@ -42,11 +43,13 @@
     "mini_917425793d27": "dublado",
     "mini_9ef008e4ee9d": "legendado",
     "mini_9f3a7fee8cfd": "legendado",
+    "mini_a71393af96d8": "dublado",
     "mini_aec30592010b": "legendado",
     "mini_b62832bce251": "legendado",
     "mini_bd89ce4e362e": "legendado",
     "mini_bfd418f6c535": "dublado",
     "mini_ca1498459797": "legendado",
+    "mini_ce2625369d1e": "legendado",
     "mini_d58eb501d7ad": "dublado",
     "mini_dd906fbf2f30": "legendado",
     "mini_e05da62f9937": "legendado",
@@ -108,6 +111,7 @@
     "mini_f9392abc3e69": "DEPOIS DO DIVÓRCIO CASEI COM O CHEFÃO E TIVE QUATRO FILHOS"
   },
   "excluded": {
-    "mini_8e40be5e6346": true
+    "mini_8e40be5e6346": true,
+    "mini_9db9f06e08b6": true
   }
 }
