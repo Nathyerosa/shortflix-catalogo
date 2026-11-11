@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "overrides": {
+    "mini_0300f2860b43": "legendado",
     "mini_04383297641a": "legendado",
     "mini_0462026d133e": "dublado",
     "mini_06b1aee9ef53": "dublado",
