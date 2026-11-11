@@ -117,6 +117,7 @@
     "mini_f9df12206260": "dublado",
     "mini_fc2571cc2fd9": "legendado",
     "mini_fd07223f682b": "dublado",
+    "mini_fd4458bedda9": "legendado",
     "mini_fd881ed8b68f": "legendado",
     "mini_ffcabe614ffd": "dublado"
   },
@@ -186,11 +187,13 @@
     "mini_ead01602c1d1": "O GAMBITO DA RAINHA DRAGÃO",
     "mini_f24954120594": "ELES OUVEM TUDO!",
     "mini_f9392abc3e69": "DEPOIS DO DIVÓRCIO CASEI COM O CHEFÃO E TIVE QUATRO FILHOS",
-    "mini_fd07223f682b": "A PRINCESA DO DON, HERDEIRA DE UM IMPÉRIO"
+    "mini_fd07223f682b": "A PRINCESA DO DON, HERDEIRA DE UM IMPÉRIO",
+    "mini_fd4458bedda9": "CINCO ANOS DE ÓDIO UMA VIDA INTEIRA DE ARREPENDIMENTO"
   },
   "excluded": {
     "mini_49f7826ba886": true,
     "mini_8e40be5e6346": true,
-    "mini_9db9f06e08b6": true
+    "mini_9db9f06e08b6": true,
+    "mini_f3fbbca6681a": true
   }
 }
