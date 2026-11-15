@@ -36,6 +36,7 @@
     "mini_26b5eba281a7": "legendado",
     "mini_28402c537447": "dublado",
     "mini_2854f654fb47": "dublado",
+    "mini_2b2a3bc0f6e6": "dublado",
     "mini_2b9754dec663": "legendado",
     "mini_2cf7a5ead18b": "legendado",
     "mini_2da7ee14d438": "dublado",
@@ -259,6 +260,7 @@
     "mini_25b98282c6f2": "O ÚLTIMO GUERREIRO FEROZ",
     "mini_28402c537447": "NOIVO TROCADO: CASEI COM UM CHEFÃO DA MÁFIA",
     "mini_2854f654fb47": "VOTOS DESPEDAÇADOS",
+    "mini_2b2a3bc0f6e6": "A DEUSA DA LUA É MINHA ESPOSA FAXINEIRA",
     "mini_30bc736a4761": "EU SALVEI SUA VIDA VOCÊ DESTRUIU A MINHA",
     "mini_3138988b8a8e": "Luna Renascida - A Segunda Chance de Alpha",
     "mini_3345bafe526b": "Uma Colegial com Alma de Chefona da Máfia",
@@ -303,6 +305,7 @@
     "mini_fd4458bedda9": "CINCO ANOS DE ÓDIO UMA VIDA INTEIRA DE ARREPENDIMENTO"
   },
   "excluded": {
+    "mini_2177ae3ee2af": true,
     "mini_49f7826ba886": true,
     "mini_80847c7b6cb1": true,
     "mini_8e40be5e6346": true,
