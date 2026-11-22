@@ -1,4 +1,4 @@
-import {createWebCommerce} from './web-commerce.js?v=20261122-watch-search-newest';
+import {createWebCommerce} from './web-commerce.js?v=20261122-watch-search-newest-v2';
 import {normalize, money, prepareIndex, filterIndex, telegramUrl, whatsappUrl, bannerUrl, languageLabel,catalogDataPath} from "./catalog-core.js?v=20261122-public";
 import {createHome} from "./home.js?v=20261122-public";
 import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js?v=20261122-public";

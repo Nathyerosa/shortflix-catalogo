@@ -140,12 +140,12 @@ export function createWebCommerce({loadProduct,createCard,show}){
     requestButton.onclick=()=>window.dispatchEvent(new CustomEvent('shortflix:request-title',{detail:{opener:requestButton}}));
     const requestCopy=node('div','');requestCopy.className='title-request-copy';
     requestCopy.append(node('p','Não encontrou a série que procura?'),node('small','Peça a série que você quer assistir. Informe o título e seu WhatsApp para que possamos avisar se ela ficar disponível.'));
-    const searchLabel=node('label','Pesquisar nas s?ries dispon?veis');searchLabel.className='watch-search';
-    const search=document.createElement('input');search.type='search';search.placeholder='Nome da s?rie';search.maxLength=160;search.autocomplete='off';searchLabel.append(search);
+    const searchLabel=node('label','Pesquisar nas séries disponíveis');searchLabel.className='watch-search';
+    const search=document.createElement('input');search.type='search';search.placeholder='Nome da série';search.maxLength=160;search.autocomplete='off';searchLabel.append(search);
     requestEntry.append(requestCopy,searchLabel,requestButton);section.append(requestEntry);
     const cards=[],normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').trim();
     const searchStatus=node('p','');searchStatus.className='watch-search-status';searchStatus.setAttribute('role','status');searchStatus.hidden=true;let loaded=false;
-    function filterCards(){const query=normalize(search.value);let visible=0;for(const row of cards){row.card.hidden=!normalize(row.title).includes(query);if(!row.card.hidden)visible++;}searchStatus.hidden=!loaded||!query;searchStatus.textContent=visible?'Encontradas: '+visible:'Nenhuma s?rie dispon?vel com esse nome.';}
+    function filterCards(){const query=normalize(search.value);let visible=0;for(const row of cards){row.card.hidden=!normalize(row.title).includes(query);if(!row.card.hidden)visible++;}searchStatus.hidden=!loaded||!query;searchStatus.textContent=visible?'Encontradas: '+visible:'Nenhuma série disponível com esse nome.';}
     search.addEventListener('input',filterCards);
     const data=await webRequest('/products/web');
     if(version!==revision)return true;
