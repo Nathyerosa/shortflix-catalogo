@@ -184,6 +184,7 @@
     "mini_b320d771dffb": "legendado",
     "mini_b405027d8cee": "dublado",
     "mini_b489ae15b677": "legendado",
+    "mini_b522d186eeb5": "legendado",
     "mini_b62832bce251": "legendado",
     "mini_b836e6b15652": "legendado",
     "mini_b89007be2137": "dublado",
@@ -357,6 +358,7 @@
     "mini_fd4458bedda9": "CINCO ANOS DE ÓDIO UMA VIDA INTEIRA DE ARREPENDIMENTO"
   },
   "excluded": {
+    "mini_08c21b7a6f09": true,
     "mini_2177ae3ee2af": true,
     "mini_3deec0b8ab54": true,
     "mini_49f7826ba886": true,
@@ -366,6 +368,7 @@
     "mini_8cf214c8173c": true,
     "mini_8e40be5e6346": true,
     "mini_9db9f06e08b6": true,
+    "mini_e37a46340acd": true,
     "mini_e53c93e90675": true,
     "mini_f3fbbca6681a": true
   }
