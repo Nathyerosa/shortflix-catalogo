@@ -12,7 +12,7 @@ export function telegramUrl(item) {
   return `https://t.me/goflixshorts_bot?start=${encodeURIComponent(item.telegramStart)}`;
 }
 export function whatsappUrl(item) {
-  const message = `Olá! Tenho interesse nesta minissérie da Shortflix.\n\nTítulo: ${item.title}\nID: ${item.id}\nLink no bot: ${telegramUrl(item)}\n\nQuero consultar a disponibilidade e como comprar pelo WhatsApp.`;
+  const message = `Olá! Preciso de suporte sobre esta minissérie da Shortflix.\n\nTítulo: ${item.title}\nID: ${item.id}\nLink no bot: ${telegramUrl(item)}\n\nPodem me ajudar?`;
   return `https://wa.me/5551980884360?text=${encodeURIComponent(message)}`;
 }
 export function bannerUrl(value) {

@@ -98,6 +98,7 @@ export function createHome({getManifest, loadPage, createPoster}) {
     return ready && items.length>1 && !paused && !document.hidden && !$("#home").hidden && !root.contains(document.activeElement);
   }
   function resetTimer() {
+    if(root.hidden){clearInterval(timer);timer=null;return;}
     clearInterval(timer);
     timer = setInterval(() => {if(canRotate()) display(selected + 1);}, 3000);
   }
@@ -165,7 +166,7 @@ export function createHome({getManifest, loadPage, createPoster}) {
     };
   });
   // In-page discovery links keep the application's hash router intact.
-  document.querySelector('.home-introduction .quiet-link').addEventListener("click",event=>{
+  document.querySelector('.home-introduction .quiet-link')?.addEventListener("click",event=>{
     event.preventDefault();$("#stories").scrollIntoView({behavior:reducedMotion.matches?"instant":"smooth",block:"start"});
     $("#home-stories-title").tabIndex=-1;$("#home-stories-title").focus({preventScroll:true});
   });

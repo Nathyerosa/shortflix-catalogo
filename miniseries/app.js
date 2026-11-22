@@ -1,11 +1,16 @@
-import {normalize, money, prepareIndex, filterIndex, telegramUrl, whatsappUrl, bannerUrl, languageLabel,catalogDataPath} from "./catalog-core.js?v=20261030-recent";
-import {createHome} from "./home.js?v=editor-hero-7a4baf5938a1";
-import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js?v=catalog-exclusions-e0dad42ebf6d";
+import {createWebCommerce} from './web-commerce.js?v=20261122-public';
+import {normalize, money, prepareIndex, filterIndex, telegramUrl, whatsappUrl, bannerUrl, languageLabel,catalogDataPath} from "./catalog-core.js?v=20261122-public";
+import {createHome} from "./home.js?v=20261122-public";
+import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js?v=20261122-public";
+import {createWebAccount,webRequest} from "./web-account.js?v=20261122-public";
+import {createStorefrontHome} from './storefront-home.js?v=20261122-public';
+import {setupTitleRequests} from './title-requests.js?v=20261122-public';
 const $ = selector => document.querySelector(selector);
 const BATCH = 36;
 let index = null, byId = null, indexPromise = null, manifestPromise = null;
 let matches = [], shown = 0, generation = 0, routeGeneration = 0, debounce = null;
 let activePage = "home", indexVersion = "", catalogInitialized = false;
+let channelFilter='all';
 const pages = new Map(),dataRoots=new Map();
 const seriesDialog=$('#series-dialog');
 let modalOrigin=null,restoreModal=true,lastScreenHash=null;
@@ -115,7 +120,7 @@ function card(item) {
   const body=document.createElement("div");body.className="card-body";
   const title=document.createElement("h2");title.textContent=item.title;
   const bottom=document.createElement("div");bottom.className="card-bottom";
-  const price=document.createElement("strong");price.textContent=money(item.price);
+  const price=document.createElement("strong");price.textContent=money(6);
   bottom.append(price);
   if(["dublado","legendado"].includes(item.language)) {const type=document.createElement("small");type.className="card-language";type.textContent=languageLabel(item.language);bottom.append(type);}body.append(title,bottom);const cover=poster(item);const hoverTitle=document.createElement("span");hoverTitle.className="cover-hover-title";hoverTitle.textContent=item.title;hoverTitle.setAttribute("aria-hidden","true");cover.append(hoverTitle);link.append(cover,body);article.append(link);return article;
 }
@@ -143,7 +148,13 @@ async function searchCatalog() {
   shown=0;$("#grid").replaceChildren();$("#more").hidden=true;$("#catalog-message").hidden=true;$("#result-count").textContent="Buscando títulos…";
   try {
     await ensureIndex();if(token!==generation)return;
-    matches=filterIndex(index,$("#search").value,$("#language").value,$("#genre").value);catalogInitialized=true;
+    let candidates=index;
+    if(channelFilter==='web'){
+      const data=await webRequest('/products/web');if(token!==generation)return;
+      if(!Array.isArray(data.product_ids)||data.product_ids.some(id=>!/^mini_[a-f0-9]{12}$/.test(id)))throw new Error('Não foi possível consultar os títulos para assistir no site.');
+      const enabled=new Set(data.product_ids);candidates=index.filter(item=>enabled.has(item.id));
+    }
+    matches=filterIndex(candidates,$("#search").value,$("#language").value,$("#genre").value);catalogInitialized=true;
     await appendBatch(token);
   } catch(error) {if(token===generation){$("#result-count").textContent="Catálogo indisponível";message(error.message,searchCatalog);}}
 }
@@ -161,25 +172,31 @@ async function detail(id,token) {
     const eyebrow=document.createElement("p");eyebrow.className="eyebrow";eyebrow.textContent="SHORTFLIX · MINI SÉRIES";
     const title=document.createElement("h2");title.id="series-heading";title.textContent=item.title;seriesDialog.setAttribute("aria-labelledby",title.id);
     const lang=document.createElement("span");lang.className="badge";lang.textContent=languageLabel(item.language);
-    const price=document.createElement("strong");price.className="detail-price";price.textContent=money(item.price);
+    const price=document.createElement("strong");price.className="detail-price";price.textContent=money(6);
     const code=document.createElement("p");code.className="product-id";code.textContent=`ID da série: ${item.id}`;
-    const actions=document.createElement("div");actions.className="actions";actions.append(externalLink("Comprar no Telegram ↗",telegramUrl(item),"primary"),externalLink("Consultar pelo WhatsApp ↗",whatsappUrl(item),"whatsapp"));
+    const actions=document.createElement("div");actions.className="actions";actions.append(externalLink("Comprar no Telegram ↗",telegramUrl(item),"primary"),externalLink("Suporte pelo WhatsApp ↗",whatsappUrl(item),"whatsapp"));
     if(item.previewUrl) actions.prepend(externalLink("Assistir prévia ↗",item.previewUrl,"secondary preview-button"));
     const genres=document.createElement("p");genres.className="muted detail-genres";genres.hidden=!item.genres?.length;genres.textContent=item.genres?.length?`Gêneros: ${item.genres.join(" · ")}`:"";
-    const note=document.createElement("p");note.className="muted detail-note";note.textContent="No Telegram, a compra e a entrega são feitas pelo bot oficial. Pelo WhatsApp, envie a mensagem para consultar a disponibilidade com o atendimento. Este catálogo não processa pagamentos nem disponibiliza vídeos.";
-    body.append(eyebrow,title,lang,genres,price,code,actions,note);layout.append(poster(item,true),body);content.replaceChildren(layout);document.title=`${item.title} | Shortflix`;$('#close-series').focus({preventScroll:true});
+    const note=document.createElement("p");note.className="muted detail-note";note.textContent="No Telegram, a compra e a entrega são feitas pelo bot oficial. O WhatsApp é exclusivo para suporte. Os títulos habilitados para a Web aparecem em Assistir na Shortflix.";
+    body.append(eyebrow,title,lang,genres,price,code,actions,note);layout.append(poster(item,true),body);content.replaceChildren(layout);document.title=`${item.title} | Shortflix`;$('#close-series').focus({preventScroll:true});webAccount.enhance(item,actions,body);
   }catch(error){if(token!==routeGeneration)return;content.textContent=error.message;const retry=document.createElement("button");retry.className="button secondary";retry.textContent="Tentar novamente";retry.onclick=()=>detail(id,routeGeneration);content.append(document.createElement("br"),retry);}
 }
 function show(screen) {
-  for(const [id,name]of [["home","home"],["catalog-screen","catalog"],["support-screen","support"]])$("#"+id).hidden=name!==screen;
-  document.querySelectorAll("[data-nav]").forEach(link=>{if(link.dataset.nav===(screen==="detail"?"catalog":screen))link.setAttribute("aria-current","page");else link.removeAttribute("aria-current");});
+  (screen==='home'?$('#home-catalog-results'):$('#catalog-screen')).append(catalogResults);
+  for(const [id,name]of [["home","home"],["catalog-screen","catalog"],["support-screen","support"],["account-screen","account"],["web-commerce-screen","web-commerce"]])$("#"+id).hidden=name!==screen;
+  const navPage=screen==='web-commerce'?(location.hash.startsWith('#/minhas-compras')?'purchases':'watch'):(screen==='detail'?'catalog':screen);
+  document.querySelectorAll("[data-nav]").forEach(link=>{if(link.dataset.nav===navPage)link.setAttribute("aria-current","page");else link.removeAttribute("aria-current");});
   activePage=screen;window.scrollTo({top:0,behavior:"instant"});$("#main").focus({preventScroll:true});
 }
 const home = createHome({getManifest:manifest, loadPage:async(number,version)=>{const [records,corrections]=await Promise.all([page(number,version),metadata()]);return applyCorrections(records,corrections);}, createPoster:poster});
 function route() {
   const token=++routeGeneration;const raw=location.hash.slice(1)||"/";const [path,params]=raw.split("?");
   document.title="Shortflix | Mini Séries";
-  if(path.startsWith("/serie/")){if(!lastScreenHash){show("catalog");if(!catalogInitialized)searchCatalog();lastScreenHash="#/catalogo";}let id;try{id=decodeURIComponent(path.slice(7));}catch{id="";}openSeries(id);return;}
+  if(path.startsWith('/conta/')){commerce.leave();closeSeries(false);show('account');webAccount.route(path,new URLSearchParams(params||''));return;}
+  webAccount.leave();
+  if(['/assistir','/minhas-compras','/checkout'].includes(path)){closeSeries(false);commerce.route(path);return;}
+  commerce.leave();
+  if(path.startsWith("/serie/")){if(!lastScreenHash||activePage==='account'){show("catalog");if(!catalogInitialized)searchCatalog();lastScreenHash="#/catalogo";}let id;try{id=decodeURIComponent(path.slice(7));}catch{id="";}openSeries(id);return;}
   closeSeries(false);lastScreenHash=location.hash||"#/";
   if(path==="/catalogo") {
     show("catalog");const requested=new URLSearchParams(params||"").get("idioma");
@@ -189,7 +206,7 @@ function route() {
     return;
   }
   show(path==="/suporte"?"support":"home");
-  if(activePage === "home") home.load();
+  if(activePage === "home") {home.load();storefront.load();if(!catalogInitialized)searchCatalog();}
 }
 $("#filters").addEventListener("submit",event=>{event.preventDefault();clearTimeout(debounce);searchCatalog();});
 $("#search").addEventListener("input",()=>{clearTimeout(debounce);++generation;debounce=setTimeout(searchCatalog,180);});
@@ -197,4 +214,38 @@ for(const selector of ["#language","#genre"])$(selector).addEventListener("chang
 $("#clear").onclick=()=>{clearTimeout(debounce);$("#search").value="";$("#language").value="all";$("#genre").value="all";searchCatalog();};
 $("#more").onclick=()=>appendBatch(generation);
 document.querySelector(".skip").addEventListener("click",event=>{event.preventDefault();$("#main").focus();});
-window.addEventListener("hashchange",route);route();
+const webAccount=createWebAccount({createPoster:poster,loadProduct:async id=>{
+  await ensureIndex();const entry=byId.get(id);
+  if(!entry)throw new Error('Título indisponível');
+  return (await resolveItems([entry]))[0];
+}});
+window.addEventListener('shortflix:checkout',()=>closeSeries(false));
+window.addEventListener('shortflix:open-owned-purchase',()=>closeSeries(false));
+const commerce=createWebCommerce({createCard:card,show,loadProduct:async id=>{
+ await ensureIndex();const entry=byId.get(id);if(!entry)throw Error('Unavailable');return (await resolveItems([entry]))[0];
+}});
+const storefront=createStorefrontHome({request:webRequest,createCard:card,loadProduct:async id=>{
+ await ensureIndex();const entry=byId.get(id);if(!entry)throw Error('Unavailable');return (await resolveItems([entry]))[0];
+}});
+// One shared search/pagination DOM, moved rather than duplicated across routes.
+const catalogResults=document.createElement('div');catalogResults.id='catalog-results';
+for(const element of [...$('#catalog-screen').children])if(!element.classList.contains('section-heading'))catalogResults.append(element);
+const homeCatalogResults=document.createElement('div');homeCatalogResults.id='home-catalog-results';
+$('.storefront-catalog').append(homeCatalogResults);
+const channelLabels={all:['Todas as minisséries','Escolha sua história e veja as opções de acesso nos detalhes.'],web:['Assistir no site','Somente minisséries habilitadas para assistir diretamente na Shortflix.'],telegram:['Comprar no Telegram','O catálogo completo está disponível pelo bot oficial do Telegram.']};
+document.querySelectorAll('.storefront-choices a').forEach((link,i)=>{
+ const channel=['all','web','telegram'][i],button=document.createElement('button');button.type='button';button.dataset.channel=channel;
+ button.append(...link.childNodes);button.setAttribute('aria-pressed',String(channel===channelFilter));link.replaceWith(button);
+ button.onclick=()=>{
+  channelFilter=channel;
+  document.querySelectorAll('[data-channel]').forEach(el=>el.setAttribute('aria-pressed',String(el===button)));
+  $('.storefront-catalog-panel>strong').textContent=channelLabels[channel][0];$('.storefront-catalog-panel>p').textContent=channelLabels[channel][1];
+  searchCatalog();
+ };
+});
+// Legacy shelves remain available to their editor, but no longer replace results.
+$('#stories').hidden=true;
+document.querySelector('.more-stories').hidden=true;
+document.querySelector('.discover').hidden=true;
+setupTitleRequests(catalogResults);
+window.addEventListener("hashchange",route);route();webAccount.start();
