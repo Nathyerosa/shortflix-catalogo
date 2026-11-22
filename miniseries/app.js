@@ -3,8 +3,8 @@ import {normalize, money, prepareIndex, filterIndex, telegramUrl, whatsappUrl, b
 import {createHome} from "./home.js?v=20261122-public";
 import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js?v=20261122-public";
 import {createWebAccount,webRequest} from "./web-account.js?v=20261122-public";
-import {createStorefrontHome} from './storefront-home.js?v=20261122-shelf-arrows';
-import {setupTitleRequests} from './title-requests.js?v=20261122-public';
+import {createStorefrontHome} from './storefront-home.js?v=20261122-public';
+import {setupTitleRequests} from './title-requests.js?v=20261122-request-series-button';
 const $ = selector => document.querySelector(selector);
 const BATCH = 36;
 let index = null, byId = null, indexPromise = null, manifestPromise = null;
@@ -175,6 +175,9 @@ async function detail(id,token) {
     const price=document.createElement("strong");price.className="detail-price";price.textContent=money(6);
     const code=document.createElement("p");code.className="product-id";code.textContent=`ID da série: ${item.id}`;
     const actions=document.createElement("div");actions.className="actions";actions.append(externalLink("Comprar no Telegram ↗",telegramUrl(item),"primary"),externalLink("Suporte pelo WhatsApp ↗",whatsappUrl(item),"whatsapp"));
+    const requestSeries=document.createElement("button");requestSeries.type="button";requestSeries.className="button primary request-series-button";requestSeries.textContent="Solicitar série";
+    requestSeries.onclick=()=>window.dispatchEvent(new CustomEvent('shortflix:request-title',{detail:{opener:requestSeries,title:item.title}}));
+    actions.insertBefore(requestSeries,actions.lastElementChild);
     if(item.previewUrl) actions.prepend(externalLink("Assistir prévia ↗",item.previewUrl,"secondary preview-button"));
     const genres=document.createElement("p");genres.className="muted detail-genres";genres.hidden=!item.genres?.length;genres.textContent=item.genres?.length?`Gêneros: ${item.genres.join(" · ")}`:"";
     const note=document.createElement("p");note.className="muted detail-note";note.textContent="No Telegram, a compra e a entrega são feitas pelo bot oficial. O WhatsApp é exclusivo para suporte. Os títulos habilitados para a Web aparecem em Assistir na Shortflix.";
