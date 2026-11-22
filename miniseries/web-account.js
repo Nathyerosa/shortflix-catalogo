@@ -221,6 +221,7 @@ export function createWebAccount({loadProduct,createPoster}){
   async enhance(item,actions,body){
    if(successNotice?.isConnected&&pendingProduct===item.id)body.prepend(successNotice);
    try{const data=await request('/products/'+encodeURIComponent(item.id)+'/web-availability');if(!data.available||data.amount_cents!==600||!actions.isConnected)return;
+    actions.querySelector('.request-series-button')?.remove();
     const button=document.createElement('button');button.type='button';button.className='button secondary web-watch-button';button.textContent='ASSISTIR AGORA - R$6,00';
     const box=document.createElement('p');box.className='web-checkout-notice';box.hidden=true;box.setAttribute('role','status');body.append(box);actions.prepend(button);
     button.onclick=async()=>{button.disabled=true;try{await begin(item,box,true);}finally{button.disabled=false;}};
