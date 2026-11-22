@@ -53,7 +53,7 @@ function metadata(){
  return metadataPromise;
 }
 async function json(path) {
-  const response = await fetch(path, {cache:"default"});
+  const response = await fetch(path, {cache:path.startsWith("data/manifest.json")?"no-store":"default"});
   if (!response.ok) throw new Error("Não foi possível carregar o catálogo. Verifique sua conexão e tente novamente.");
   return response.json();
 }
@@ -227,6 +227,39 @@ const commerce=createWebCommerce({createCard:card,show,loadProduct:async id=>{
 const storefront=createStorefrontHome({request:webRequest,createCard:card,loadProduct:async id=>{
  await ensureIndex();const entry=byId.get(id);if(!entry)throw Error('Unavailable');return (await resolveItems([entry]))[0];
 }});
+let catalogRefresh=null,lastCatalogCheck=0;
+function canRefreshCatalog(){
+ return document.visibilityState!=='hidden'&&!seriesDialog.open&&
+  (activePage==='home'||activePage==='catalog'||(activePage==='web-commerce'&&location.hash==='#/assistir'));
+}
+function checkCatalogUpdates(){
+ if(!canRefreshCatalog()||catalogRefresh||Date.now()-lastCatalogCheck<15000)return catalogRefresh;
+ lastCatalogCheck=Date.now();
+ catalogRefresh=(async()=>{
+  await ensureIndex();
+  const current=await manifest(),info=await json('data/manifest.json?refresh='+Date.now());
+  const corrections=await fetchCorrections('data/language-overrides.json?refresh='+Date.now());
+  if(info.version===indexVersion&&JSON.stringify(corrections)===JSON.stringify(await metadata()))return;
+  if(info.total<current.total)throw Error('Incomplete catalog update');
+  const root=catalogDataPath(info),data=await json(root+'search-index.json?v='+encodeURIComponent(info.version));
+  if(!Array.isArray(data.items)||data.items.length!==info.total)throw Error('Incomplete catalog update');
+  const next=prepareIndex(applyCorrections(data.items,corrections));
+  if(!canRefreshCatalog())return;
+  ++generation;pages.clear();index=next;indexVersion=info.version;byId=new Map(next.map(item=>[item.id,item]));
+  dataRoots.set(info.version,root);manifestPromise=Promise.resolve(info);indexPromise=Promise.resolve(next);metadataPromise=Promise.resolve(corrections);
+  populateFilters();catalogInitialized=false;
+  const hash=location.hash,x=window.scrollX,y=window.scrollY;
+  if(activePage==='home'||activePage==='catalog'){
+   await searchCatalog();
+   if(location.hash===hash&&!seriesDialog.open)window.scrollTo({left:x,top:y,behavior:'instant'});
+  }else if(hash==='#/assistir')await commerce.route('/assistir');
+ })().catch(()=>{/* Keep the last complete catalog available when refresh fails. */}).finally(()=>{catalogRefresh=null;});
+ return catalogRefresh;
+}
+window.addEventListener('focus',checkCatalogUpdates);
+window.addEventListener('hashchange',checkCatalogUpdates);
+document.addEventListener('visibilitychange',checkCatalogUpdates);
+setInterval(checkCatalogUpdates,90000);
 // One shared search/pagination DOM, moved rather than duplicated across routes.
 const catalogResults=document.createElement('div');catalogResults.id='catalog-results';
 for(const element of [...$('#catalog-screen').children])if(!element.classList.contains('section-heading'))catalogResults.append(element);
