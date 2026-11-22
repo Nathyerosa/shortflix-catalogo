@@ -29,9 +29,9 @@ export function setupTitleRequests(container){
  const entry=document.createElement('div');entry.className='title-request-entry';
  const description=document.createElement('p');description.textContent='Não encontrou a minissérie que procura?';
  const open=document.createElement('button');open.type='button';open.className='button secondary';open.textContent='Solicitar uma minissérie';
- function openRequest(trigger,initialTitle=''){opener=trigger;status.textContent='';form.hidden=false;introduction.hidden=false;heading.textContent=initialHeading;form.elements.title.value=initialTitle.trim().slice(0,160);dialog.showModal();form.elements.title.focus();}
+ function openRequest(trigger,initialTitle='',referenceUrl=''){opener=trigger;status.textContent='';form.hidden=false;introduction.hidden=false;heading.textContent=initialHeading;form.elements.title.value=initialTitle.trim().slice(0,160);form.elements.reference_url.value=referenceUrl;dialog.showModal();form.elements.title.focus();}
  open.onclick=()=>openRequest(open,document.querySelector('#search').value);
- window.addEventListener('shortflix:request-title',event=>openRequest(event.detail?.opener||open,event.detail?.title||''));
+ window.addEventListener('shortflix:request-title',event=>openRequest(event.detail?.opener||open,event.detail?.title||'',event.detail?.referenceUrl||''));
  entry.append(description,open);container.querySelector('#filters').after(entry);
  form.onsubmit=async event=>{
   event.preventDefault();if(busy||!form.reportValidity())return;
