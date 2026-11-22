@@ -140,11 +140,19 @@ export function createWebCommerce({loadProduct,createCard,show}){
     requestButton.onclick=()=>window.dispatchEvent(new CustomEvent('shortflix:request-title',{detail:{opener:requestButton}}));
     const requestCopy=node('div','');requestCopy.className='title-request-copy';
     requestCopy.append(node('p','Não encontrou a série que procura?'),node('small','Peça a série que você quer assistir. Informe o título e seu WhatsApp para que possamos avisar se ela ficar disponível.'));
-    requestEntry.append(requestCopy,requestButton);section.append(requestEntry);
+    const searchLabel=node('label','Pesquisar nas s?ries dispon?veis');searchLabel.className='watch-search';
+    const search=document.createElement('input');search.type='search';search.placeholder='Nome da s?rie';search.maxLength=160;search.autocomplete='off';searchLabel.append(search);
+    requestEntry.append(requestCopy,searchLabel,requestButton);section.append(requestEntry);
+    const cards=[],normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').trim();
+    const searchStatus=node('p','');searchStatus.className='watch-search-status';searchStatus.setAttribute('role','status');searchStatus.hidden=true;let loaded=false;
+    function filterCards(){const query=normalize(search.value);let visible=0;for(const row of cards){row.card.hidden=!normalize(row.title).includes(query);if(!row.card.hidden)visible++;}searchStatus.hidden=!loaded||!query;searchStatus.textContent=visible?'Encontradas: '+visible:'Nenhuma s?rie dispon?vel com esse nome.';}
+    search.addEventListener('input',filterCards);
     const data=await webRequest('/products/web');
-    const grid=document.createElement('div');grid.className='catalog';section.append(grid);
+    if(version!==revision)return true;
+    const grid=document.createElement('div');grid.className='catalog';section.append(searchStatus,grid);
     if(!data.product_ids.length)section.append(node('p','Novas minisséries para assistir aqui em breve. O catálogo completo continua no Telegram.'));
-    for(const id of data.product_ids){const item=await loadProduct(id);if(version!==revision)return true;grid.append(createCard(item));}
+    for(const id of data.product_ids){const item=await loadProduct(id);if(version!==revision)return true;const card=createCard(item);cards.push({title:item.title,card});grid.append(card);filterCards();}
+    loaded=true;filterCards();
    }else if(path==='/minhas-compras'){
     const data=await webRequest('/purchases');if(version!==revision)return true;
     if(!data.purchases.length)section.append(node('p','Você ainda não tem compras Web.'));
