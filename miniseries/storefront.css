@@ -1,4 +1,15 @@
 /* Shortflix storefront: scoped Home presentation; checkout/player stay intact. */
+.storefront-rail{position:relative;min-width:0}
+.storefront-rail .storefront-shelf{scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px}
+.storefront-rail .storefront-shelf::-webkit-scrollbar{display:none}
+.shelf-arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:44px;min-height:76px;padding:0;border:1px solid #ffffff24;border-radius:12px;background:#090b11c9;color:#fff;box-shadow:0 4px 22px #000b;backdrop-filter:blur(6px);cursor:pointer}
+.shelf-arrow-previous{left:7px}.shelf-arrow-next{right:7px}
+.shelf-arrow span{width:13px;height:13px;border-top:3px solid currentColor;border-right:3px solid currentColor;transform:rotate(45deg);margin-left:-5px}
+.shelf-arrow-previous span{transform:rotate(-135deg);margin-left:5px}
+.shelf-arrow:hover:not(:disabled){background:#090b11ed;border-color:#ffffff70}
+.shelf-arrow:disabled{opacity:.28;cursor:default}
+.shelf-arrow:focus-visible{outline:2px solid #ff4167;outline-offset:3px}
+@media(max-width:700px){.shelf-arrow{min-height:60px}.shelf-arrow-previous{left:3px}.shelf-arrow-next{right:3px}}
 .storefront-hero{position:relative;isolation:isolate;display:flex;align-items:center;min-height:425px;padding:48px;border:1px solid #ec315330;border-radius:22px;overflow:hidden;background:#190106}
 .storefront-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-2}
 .storefront-hero:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#090509ed 0%,#110307b8 32%,#18000822 65%,transparent)}

@@ -3,7 +3,7 @@ import {normalize, money, prepareIndex, filterIndex, telegramUrl, whatsappUrl, b
 import {createHome} from "./home.js?v=20261122-public";
 import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js?v=20261122-public";
 import {createWebAccount,webRequest} from "./web-account.js?v=20261122-public";
-import {createStorefrontHome} from './storefront-home.js?v=20261122-public';
+import {createStorefrontHome} from './storefront-home.js?v=20261122-shelf-arrows';
 import {setupTitleRequests} from './title-requests.js?v=20261122-public';
 const $ = selector => document.querySelector(selector);
 const BATCH = 36;
