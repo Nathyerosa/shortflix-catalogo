@@ -1,5 +1,5 @@
-import {createCheckoutDialog} from './checkout-dialog.js?v=20261122-public';
-import {webRequest} from './web-account.js?v=20261122-public';
+import {createCheckoutDialog} from './checkout-dialog.js?v=20261122-watch-search-newest-v3';
+import {webRequest} from './web-account.js?v=20261122-watch-search-newest-v3';
 
 // Provider credentials and payment confirmation remain exclusively server-side.
 export function createWebCommerce({loadProduct,createCard,show}){
