@@ -2,7 +2,7 @@ import {createWebCommerce} from './web-commerce.js?v=20261122-watch-search-newes
 import {normalize, money, prepareIndex, filterIndex, telegramUrl, whatsappUrl, bannerUrl, languageLabel,catalogDataPath} from "./catalog-core.js?v=20261122-watch-search-newest-v3";
 import {createHome} from "./home.js?v=20261122-watch-search-newest-v3";
 import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js?v=20261122-watch-search-newest-v3";
-import {createWebAccount,webRequest} from "./web-account.js?v=20261124-password-8-eye";
+import {createWebAccount,webRequest} from "./web-account.js?v=20261124-channel-prices";
 import {createStorefrontHome} from './storefront-home.js?v=20261122-watch-search-newest-v3';
 import {setupTitleRequests} from './title-requests.js?v=20261122-watch-search-newest-v3';
 const $ = selector => document.querySelector(selector);
@@ -174,8 +174,8 @@ async function detail(id,token) {
     const lang=document.createElement("span");lang.className="badge";lang.textContent=languageLabel(item.language);
     const price=document.createElement("strong");price.className="detail-price";price.textContent=money(6);
     const code=document.createElement("p");code.className="product-id";code.textContent=`ID da série: ${item.id}`;
-    const actions=document.createElement("div");actions.className="actions";actions.append(externalLink("Comprar no Telegram ↗",telegramUrl(item),"primary"),externalLink("Suporte pelo WhatsApp ↗",whatsappUrl(item),"whatsapp"));
-    const requestSeries=document.createElement("button");requestSeries.type="button";requestSeries.className="button primary request-series-button";requestSeries.textContent="Solicitar para assistir no site";
+    const actions=document.createElement("div");actions.className="actions";actions.append(externalLink("Comprar no Telegram - R$ 5,00 ↗",telegramUrl(item),"primary"),externalLink("Suporte pelo WhatsApp ↗",whatsappUrl(item),"whatsapp"));
+    const requestSeries=document.createElement("button");requestSeries.type="button";requestSeries.className="button primary request-series-button";requestSeries.textContent="Solicitar para assistir no site - R$ 6,00";
     requestSeries.onclick=()=>window.dispatchEvent(new CustomEvent('shortflix:request-title',{detail:{opener:requestSeries,title:item.title,referenceUrl:new URL('#/serie/'+item.id,location.href).href}}));
     actions.insertBefore(requestSeries,actions.lastElementChild);
     if(item.previewUrl) actions.prepend(externalLink("Assistir prévia ↗",item.previewUrl,"secondary preview-button"));
