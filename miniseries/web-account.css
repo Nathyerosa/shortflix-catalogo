@@ -118,3 +118,11 @@
 .drive-request-close{display:block;margin-left:auto;min-height:36px;padding:6px 12px}.drive-request-window .purchase-download-body h3{margin-top:8px}.drive-request-window input[type=email]{width:100%;min-width:0;box-sizing:border-box}.drive-request-window .button{max-width:100%;white-space:normal}
 .drive-request-window .purchase-download-body>button+a{display:inline-block;margin-left:16px;margin-top:10px}
 @media(max-width:480px){.drive-request-window .purchase-download-body>button+a{display:block;margin-left:0;margin-top:16px}}
+
+/* Password visibility control */
+.account-form .password-field{position:relative;display:block;width:100%;min-width:0}
+.account-form .password-field input{width:100%;box-sizing:border-box;padding-right:54px}
+.account-form .password-toggle{position:absolute;right:5px;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:44px;height:44px;min-height:44px;padding:0;margin:0;border:0;border-radius:8px;background:transparent;color:var(--muted,#c4c5d1);cursor:pointer}
+.account-form .password-toggle:hover{color:#fff;background:#ffffff0d}
+.account-form .password-toggle:focus-visible{outline:2px solid #efb941;outline-offset:-2px}
+.password-eye-slash[hidden]{display:none}

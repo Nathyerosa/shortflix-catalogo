@@ -1,3 +1,19 @@
+
+function decoratePasswordFields(content){
+ const eye='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18" hidden/></svg>';
+ content.querySelectorAll('input[type="password"]').forEach(input=>{
+  if(input.closest('.password-field'))return;
+  const wrap=document.createElement('span');wrap.className='password-field';
+  input.replaceWith(wrap);wrap.append(input);
+  const toggle=document.createElement('button');toggle.type='button';toggle.className='password-toggle';
+  toggle.innerHTML=eye;toggle.setAttribute('aria-label','Mostrar senha');toggle.setAttribute('aria-pressed','false');
+  toggle.addEventListener('click',event=>{
+   event.preventDefault();const visible=input.type==='password';input.type=visible?'text':'password';
+   toggle.setAttribute('aria-label',visible?'Ocultar senha':'Mostrar senha');toggle.setAttribute('aria-pressed',String(visible));
+   toggle.querySelector('.password-eye-slash').toggleAttribute('hidden',!visible);
+  });wrap.append(toggle);
+ });
+}
 // UI and API orchestration only. Identity, verification, sessions and authorization live in Python.
 // Pinned public origins only. URL parameters/catalog records cannot select an API.
 export function webApiRoot(origin=location.origin){
@@ -11,8 +27,8 @@ const safeTarget=value=>typeof value==='string'&&/^#\/(?:catalogo|serie\/mini_[a
 class ApiError extends Error{constructor(code,status=503){super(code);this.status=status;}}
 const messages={invalid_credentials:"E-mail ou senha incorretos. Confira os dados ou recupere seu acesso.",
  pilot_login_required:"Esse e-mail já possui cadastro. Entre com a senha dessa conta para receber o código de confirmação.",
- expired_action:"Este link expirou. Solicite um novo e-mail de confirmação ou recuperação.",password_policy:"A senha não atende à política de segurança. Use pelo menos 12 caracteres e confira os requisitos do serviço.",
- password_too_short:"Use uma senha com pelo menos 12 caracteres.",too_many_attempts:"Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.",
+ expired_action:"Este link expirou. Solicite um novo e-mail de confirmação ou recuperação.",password_policy:"A senha não atende à política de segurança. Use pelo menos 8 caracteres.",
+ password_too_short:"Use uma senha com pelo menos 8 caracteres.",too_many_attempts:"Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.",
  invalid_action:"Este código é inválido ou expirou. Solicite uma nova confirmação ou recuperação.",
  invalid_otp:"Não foi possível confirmar este código. Confira os seis dígitos e use somente o código mais recente. Após cinco tentativas, solicite outro.",
  expired_otp:"Este código expirou. Solicite um novo código de confirmação.",
@@ -128,7 +144,7 @@ export function createWebAccount({loadProduct,createPoster}){
   viewVersion++;clearTimeout(otpTimer);content.replaceChildren();notify(flash);flash='';
   selection(view);
   if(view==='cadastro'){
-   content.innerHTML='<h2>Crie sua conta</h2><p class="account-intro">Seu catálogo continua livre. Confirme seu e-mail para continuar com uma compra pela Web.</p><form id="web-register" class="account-form"><label>E-mail<input name="email" type="email" autocomplete="email" maxlength="254" required placeholder="voce@exemplo.com"></label><label>Senha<input name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required placeholder="Crie sua senha"><small>Pelo menos 12 caracteres.</small></label><button type="submit" class="button primary">Criar minha conta</button></form><p class="account-switch">Já tem uma conta? <a data-account-view="login">Entrar</a></p>';
+   content.innerHTML='<h2>Crie sua conta</h2><p class="account-intro">Seu catálogo continua livre. Confirme seu e-mail para continuar com uma compra pela Web.</p><form id="web-register" class="account-form"><label>E-mail<input name="email" type="email" autocomplete="email" maxlength="254" required placeholder="voce@exemplo.com"></label><label>Senha<input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Crie sua senha"><small>Pelo menos 8 caracteres.</small></label><button type="submit" class="button primary">Criar minha conta</button></form><p class="account-switch">Já tem uma conta? <a data-account-view="login">Entrar</a></p>';
    const nameLabel=document.createElement('label');nameLabel.textContent='Seu nome';const nameInput=document.createElement('input');nameInput.name='name';nameInput.autocomplete='name';nameInput.maxLength=100;nameInput.required=true;nameInput.placeholder='Como podemos chamar você?';nameLabel.append(nameInput);content.querySelector('#web-register').prepend(nameLabel);
    registrationConsent();
    bindForm('web-register',async(data,form)=>{lastEmail=data.get('email');await post('/auth/register',{email:lastEmail,password:data.get('password'),...(otpMode?{name:data.get('name')}:{}) ,...(marketingCopy?{marketing_consent:data.get('marketing_consent')==='yes',marketing_consent_version:marketingCopy.version}:{})});if(otpMode){accountVersion++;account=null;header();}if(isCurrent(form)){otpReadyAt=Date.now()+60000;flash=otpMode?'Para confirmar seu cadastro, enviamos um código por e-mail. Confira sua caixa de entrada e também o spam.':'Cadastro recebido. Confira a confirmação do seu e-mail para continuar.';go('verificar');}});
@@ -139,7 +155,7 @@ export function createWebAccount({loadProduct,createPoster}){
   }else if(view==='nova-senha'&&hostedReset&&!linkAction){
    content.innerHTML='<h2>Confira seu e-mail</h2><p class="account-intro">Abra o link de recuperação recebido para escolher sua nova senha. Confira também o spam. Depois, volte para entrar na Shortflix.</p><div class="account-actions"><a class="button primary" data-account-view="login">Voltar para entrar</a><a class="button secondary" data-account-view="recuperar">Solicitar outro link</a></div>';
   }else if(view==='nova-senha'){
-   content.innerHTML='<h2>Uma nova senha</h2><p class="account-intro">Use o código da recuperação e escolha sua nova senha. Você precisará entrar novamente.</p><form id="web-reset" class="account-form"><label>Código de recuperação<input name="code" autocomplete="one-time-code" maxlength="2048" required placeholder="Cole o código recebido"></label><label>Nova senha<input name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required placeholder="Pelo menos 12 caracteres"></label><button type="submit" class="button primary">Salvar nova senha</button></form><p class="account-switch"><a data-account-view="recuperar">Solicitar outro código</a></p>';
+   content.innerHTML='<h2>Uma nova senha</h2><p class="account-intro">Use o código da recuperação e escolha sua nova senha. Você precisará entrar novamente.</p><form id="web-reset" class="account-form"><label>Código de recuperação<input name="code" autocomplete="one-time-code" maxlength="2048" required placeholder="Cole o código recebido"></label><label>Nova senha<input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Pelo menos 8 caracteres"></label><button type="submit" class="button primary">Salvar nova senha</button></form><p class="account-switch"><a data-account-view="recuperar">Solicitar outro código</a></p>';
    bindForm('web-reset',async(data,form)=>{await post('/auth/password/reset-confirm',{code:data.get('code'),password:data.get('password')});linkAction=null;accountVersion++;account=null;header();if(isCurrent(form)){flash='Senha atualizada. Entre com sua nova senha para continuar.';go('login');}});inbox('resetPassword');
   }else if(view==='verificar'){
    content.innerHTML='<span class="account-state pending">Confirmação pendente</span><h2>Confirme seu e-mail</h2><p class="account-intro">Falta só confirmar que este endereço é seu. Sem essa confirmação, compras pela Web ficam bloqueadas.</p><div id="verification-email"></div><form id="web-verify" class="account-form"><label>Código de confirmação<input name="code" autocomplete="one-time-code" maxlength="2048" required placeholder="Cole o código recebido"></label><button type="submit" class="button primary">Confirmar meu e-mail</button></form><div class="account-actions"><button id="web-check-verified" type="button" class="button secondary">Já confirmei meu e-mail</button><button id="web-resend" type="button" class="text-button">Reenviar confirmação</button></div><p class="account-switch"><a data-account-view="login">Voltar para entrar</a></p>';
@@ -175,6 +191,7 @@ export function createWebAccount({loadProduct,createPoster}){
    content.innerHTML='<h2>Bom ter você de volta</h2><p class="account-intro">Entre para continuar sua próxima história na Shortflix.</p><form id="web-login" class="account-form"><label>E-mail<input name="email" type="email" autocomplete="email" maxlength="254" required placeholder="voce@exemplo.com"></label><label>Senha<input name="password" type="password" autocomplete="current-password" maxlength="128" required placeholder="Sua senha"></label><a class="account-forgot" data-account-view="recuperar">Esqueci minha senha</a><button type="submit" class="button primary">Entrar na minha conta</button></form><div class="account-switch account-new-customer"><span>Ainda não tem uma conta?</span><a class="button account-create" data-account-view="cadastro">Criar conta</a></div>';
    bindForm('web-login',async(data,form)=>{lastEmail=data.get('email');const result=await post('/auth/login',{email:lastEmail,password:data.get('password')});accountVersion++;account=result;header();if(!isCurrent(form))return;target=safeTarget(result.return_to);if(account.can_purchase)resume();else{flash='Confirme seu e-mail para continuar com esta minissérie.';go('verificar');}});
   }
+  decoratePasswordFields(content);
   const email=content.querySelector('input[type=email]');if(email)email.value=lastEmail;decorateLinks();
   if(otpMode&&view==='verificar'&&linkAction?.kind==='verifyEmail'){linkAction=null;notify('A confirmação agora usa um código de seis dígitos. Entre na sua conta para solicitar um código.');}
   if(linkAction&&((view==='verificar'&&linkAction.kind==='verifyEmail')||(view==='nova-senha'&&linkAction.kind==='resetPassword'))){
@@ -217,7 +234,7 @@ export function createWebAccount({loadProduct,createPoster}){
    if(params.has('code')||params.has('oobCode')||params.has('token')){history.replaceState(null,'',href('verificar'));flash='Abra o link enviado por e-mail ou solicite uma nova confirmação.';render('verificar');return;}
    if(path==='/conta/retorno'){flash='Entre na sua conta para confirmar o estado do seu acesso e continuar.';render('login');return;}
    render(path.split('/')[2]||'login');},
-  leave(){viewVersion++;clearTimeout(otpTimer);linkAction=null;target='#/catalogo';content.querySelectorAll('input[type=password],input[name=code]').forEach(input=>input.value='');},
+  leave(){viewVersion++;clearTimeout(otpTimer);linkAction=null;target='#/catalogo';content.querySelectorAll('input[name=password],input[name=code]').forEach(input=>input.value='');},
   async enhance(item,actions,body){
    if(successNotice?.isConnected&&pendingProduct===item.id)body.prepend(successNotice);
    try{const data=await request('/products/'+encodeURIComponent(item.id)+'/web-availability');if(!data.available||data.amount_cents!==600||!actions.isConnected)return;

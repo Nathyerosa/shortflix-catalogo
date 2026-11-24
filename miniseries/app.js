@@ -2,7 +2,7 @@ import {createWebCommerce} from './web-commerce.js?v=20261122-watch-search-newes
 import {normalize, money, prepareIndex, filterIndex, telegramUrl, whatsappUrl, bannerUrl, languageLabel,catalogDataPath} from "./catalog-core.js?v=20261122-watch-search-newest-v3";
 import {createHome} from "./home.js?v=20261122-watch-search-newest-v3";
 import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js?v=20261122-watch-search-newest-v3";
-import {createWebAccount,webRequest} from "./web-account.js?v=20261122-watch-search-newest-v3";
+import {createWebAccount,webRequest} from "./web-account.js?v=20261124-password-8-eye";
 import {createStorefrontHome} from './storefront-home.js?v=20261122-watch-search-newest-v3';
 import {setupTitleRequests} from './title-requests.js?v=20261122-watch-search-newest-v3';
 const $ = selector => document.querySelector(selector);
