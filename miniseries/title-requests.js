@@ -1,4 +1,5 @@
 import {webApiRoot} from './web-account.js?v=20261122-public';
+import {bannerUrl} from './catalog-core.js?v=20261030-recent';
 
 export function setupTitleRequests(container){
  const dialog=document.createElement('dialog');dialog.className='title-request-dialog';dialog.setAttribute('aria-labelledby','title-request-heading');
@@ -7,16 +8,26 @@ export function setupTitleRequests(container){
  const submitButton=form.querySelector('[type=submit]'),available=document.createElement('section');
  available.className='request-available';available.hidden=true;available.setAttribute('aria-live','polite');
  form.elements.title.closest('label').after(available);
- let exactAvailable=false,lookupSequence=0,lookupTimer=null;
+ let exactAvailable=false,lookupSequence=0,lookupTimer=null,reviewKey='',reviewed=false;
  function showAvailable(matches){
+  const key=JSON.stringify([form.elements.title.value,form.elements.reference_url.value,matches.map(item=>[item.product_id,item.exact])]);
+  if(key!==reviewKey){reviewKey=key;reviewed=false;}
   available.replaceChildren();exactAvailable=matches.some(item=>item.exact);submitButton.disabled=busy||exactAvailable;
   available.hidden=!matches.length;if(!matches.length)return;
   const message=document.createElement('p');message.textContent=exactAvailable?'Esta minissérie já está disponível para assistir no site! Não precisa solicitar.':'Encontramos títulos parecidos disponíveis no site. Confira antes de solicitar:';available.append(message);
   for(const item of matches){
    if(!/^mini_[a-f0-9]{12}$/.test(item.product_id))continue;
-   const title=document.createElement('p');title.textContent=item.title;
+   const card=document.createElement('div');card.className='request-suggestion';
+   const cover=bannerUrl(item.banner);if(cover){const image=document.createElement('img');image.src=cover;image.alt='Capa de '+item.title;image.loading='lazy';image.onerror=()=>image.remove();card.append(image);}
+   const info=document.createElement('div');const title=document.createElement('p');title.textContent=item.title;
    const link=document.createElement('a');link.className='button primary';link.href='#/serie/'+item.product_id;link.textContent='Comprar no site - R$ 6,00';link.addEventListener('click',()=>close());
-   available.append(title,link);
+   info.append(title,link);card.append(info);available.append(card);
+  }
+  if(!exactAvailable){
+   const label=document.createElement('label');label.className='request-match-confirmation';
+   const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.required=true;checkbox.checked=reviewed;
+   const text=document.createElement('span');text.textContent='Nenhuma dessas é a série que procuro';label.append(checkbox,text);available.append(label);
+   checkbox.addEventListener('change',()=>{reviewed=checkbox.checked;});
   }
  }
  async function checkAvailability(){
@@ -73,9 +84,10 @@ export function setupTitleRequests(container){
    const challenge=await fetch(root+'/title-requests/csrf',options);
    if(!challenge.ok)throw Error('unavailable');const data=await challenge.json();
    const body=Object.fromEntries(new FormData(form));body.consent=form.elements.consent.checked;
+   body.suggestions_reviewed=reviewed;
    const response=await fetch(root+'/title-requests',{...options,method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':data.csrf_token},body:JSON.stringify(body)});
    if(!response.ok){
-    if(response.status===409){const existing=await response.json();if(existing.error==='title_already_available'){showAvailable(existing.matches||[]);status.textContent='Esta série já está disponível. Abra o título acima para comprar e assistir.';return;}}
+    if(response.status===409){const existing=await response.json();if(['title_already_available','review_available_titles'].includes(existing.error)){showAvailable(existing.matches||[]);status.textContent=existing.error==='title_already_available'?'Esta série já está disponível. Abra o título acima para comprar e assistir.':'Confira as capas acima. Se for outra série, marque “Nenhuma dessas é a série que procuro” para enviar.';return;}}
     if(response.status===429)throw Error('limit');
     if(response.status>=500)throw Error('unavailable');
     if(response.status===403)throw Error('csrf_failed');
