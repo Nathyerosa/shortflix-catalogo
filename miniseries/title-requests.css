@@ -3,3 +3,5 @@
 #web-commerce-screen .title-request-entry{margin-bottom:32px} .title-request-copy{display:grid;gap:8px;max-width:620px}.title-request-copy small{font-size:13px;line-height:1.6;color:#c8c0cc}.title-request-entry .button{flex-shrink:0}
 
 #web-commerce-screen .title-request-entry{flex-wrap:wrap}#web-commerce-screen .title-request-copy{flex:1 1 300px}.watch-search{display:grid;gap:8px;flex:1 1 240px;max-width:340px;font-size:13px}.watch-search input{width:100%;min-width:0;padding:12px;border:1px solid #514352;border-radius:10px;background:#0d1019;color:#fff;font:inherit}.watch-search input:focus-visible{outline:2px solid #ed2858;outline-offset:2px}.watch-search-status{margin:0 0 20px;color:#c8c0cc}@media(max-width:600px){.watch-search{max-width:none;flex:auto;width:100%}.watch-search input{font-size:16px}}
+
+.request-available:not([hidden]){padding:16px;border:1px solid #efb94166;border-radius:12px;background:#efb9410d}.request-available p{margin:0 0 12px}.request-available .button{width:100%;margin-bottom:10px;white-space:normal}

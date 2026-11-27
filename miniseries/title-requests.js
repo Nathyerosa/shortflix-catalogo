@@ -4,6 +4,36 @@ export function setupTitleRequests(container){
  const dialog=document.createElement('dialog');dialog.className='title-request-dialog';dialog.setAttribute('aria-labelledby','title-request-heading');
  dialog.innerHTML=`<button type="button" class="close" aria-label="Fechar solicitação">×</button><h2 id="title-request-heading">Qual história você procura?</h2><p class="request-introduction">Conte para a gente. Se a minissérie ficar disponível, poderemos avisar pelo WhatsApp. A solicitação não garante que conseguiremos o título.</p><form class="account-form"><label>Nome da minissérie<input name="title" required minlength="2" maxlength="160" autocomplete="off"></label><label>Link de referência <small>(opcional)</small><input name="reference_url" type="url" placeholder="https://…" maxlength="700"></label><label>WhatsApp com DDD<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required maxlength="15" pattern="&#92;([1-9][0-9]&#92;) (?:9[0-9]{4}|[2-9][0-9]{3})-[0-9]{4}" title="Informe 2 dígitos de DDD e um número com 8 ou 9 dígitos."></label><div class="request-honeypot" aria-hidden="true"><label>Não preencha<input name="website" tabindex="-1" autocomplete="off"></label></div><label class="request-consent"><input name="consent" type="checkbox" required><span>Autorizo a Shortflix a entrar em contato pelo WhatsApp para avisar sobre esta solicitação.</span></label><small>Seu número será usado apenas para este pedido, sem inclusão automática em promoções. Para retirar a autorização, fale com o suporte.</small><button class="button primary" type="submit">Enviar solicitação</button></form><p class="request-status" role="status" aria-live="polite"></p><a class="quiet-link" href="#/suporte">Falar com o suporte</a>`;
  document.body.append(dialog);const form=dialog.querySelector('form'),status=dialog.querySelector('.request-status'),introduction=dialog.querySelector('.request-introduction'),heading=dialog.querySelector('h2'),initialHeading=heading.textContent;let opener=null,busy=false;
+ const submitButton=form.querySelector('[type=submit]'),available=document.createElement('section');
+ available.className='request-available';available.hidden=true;available.setAttribute('aria-live','polite');
+ form.elements.title.closest('label').after(available);
+ let exactAvailable=false,lookupSequence=0,lookupTimer=null;
+ function showAvailable(matches){
+  available.replaceChildren();exactAvailable=matches.some(item=>item.exact);submitButton.disabled=busy||exactAvailable;
+  available.hidden=!matches.length;if(!matches.length)return;
+  const message=document.createElement('p');message.textContent=exactAvailable?'Esta minissérie já está disponível para assistir no site! Não precisa solicitar.':'Encontramos títulos parecidos disponíveis no site. Confira antes de solicitar:';available.append(message);
+  for(const item of matches){
+   if(!/^mini_[a-f0-9]{12}$/.test(item.product_id))continue;
+   const title=document.createElement('p');title.textContent=item.title;
+   const link=document.createElement('a');link.className='button primary';link.href='#/serie/'+item.product_id;link.textContent='Comprar no site - R$ 6,00';link.addEventListener('click',()=>close());
+   available.append(title,link);
+  }
+ }
+ async function checkAvailability(){
+  const sequence=++lookupSequence,title=form.elements.title.value.trim(),reference=form.elements.reference_url.value.trim();
+  if(title.length<2){showAvailable([]);return false;}
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),10000);
+  try{
+   const query=new URLSearchParams({title,reference});
+   const response=await fetch(webApiRoot()+'/title-requests/availability?'+query,{credentials:'include',cache:'no-store',signal:controller.signal});
+   if(!response.ok)throw Error('lookup');const result=await response.json();
+   if(sequence!==lookupSequence||!dialog.open)return false;
+   showAvailable(Array.isArray(result.matches)?result.matches:[]);return exactAvailable;
+  }catch{return false;}finally{clearTimeout(timeout);}
+ }
+ for(const input of [form.elements.title,form.elements.reference_url])input.addEventListener('input',()=>{
+  ++lookupSequence;showAvailable([]);clearTimeout(lookupTimer);lookupTimer=setTimeout(checkAvailability,350);
+ });
  const consent=form.elements.consent;
  consent.addEventListener('invalid',()=>{
   consent.setCustomValidity(consent.checked?'':'Marque esta opção para autorizar o aviso pelo WhatsApp sobre seu pedido.');
@@ -25,16 +55,16 @@ export function setupTitleRequests(container){
  function close(){dialog.close();opener?.focus({preventScroll:true});}
  dialog.querySelector('.close').onclick=close;
  dialog.addEventListener('click',e=>{if(e.target===dialog)close();});
- dialog.addEventListener('close',()=>{if(!busy){form.reset();status.textContent='';}});
+ dialog.addEventListener('close',()=>{++lookupSequence;clearTimeout(lookupTimer);showAvailable([]);if(!busy){form.reset();status.textContent='';}});
  const entry=document.createElement('div');entry.className='title-request-entry';
  const description=document.createElement('p');description.textContent='Não encontrou a minissérie que procura?';
  const open=document.createElement('button');open.type='button';open.className='button secondary';open.textContent='Solicitar uma minissérie';
- function openRequest(trigger,initialTitle='',referenceUrl=''){opener=trigger;status.textContent='';form.hidden=false;introduction.hidden=false;heading.textContent=initialHeading;form.elements.title.value=initialTitle.trim().slice(0,160);form.elements.reference_url.value=referenceUrl;dialog.showModal();form.elements.title.focus();}
+ function openRequest(trigger,initialTitle='',referenceUrl=''){opener=trigger;status.textContent='';showAvailable([]);form.hidden=false;introduction.hidden=false;heading.textContent=initialHeading;form.elements.title.value=initialTitle.trim().slice(0,160);form.elements.reference_url.value=referenceUrl;dialog.showModal();form.elements.title.focus();checkAvailability();}
  open.onclick=()=>openRequest(open,document.querySelector('#search').value);
  window.addEventListener('shortflix:request-title',event=>openRequest(event.detail?.opener||open,event.detail?.title||'',event.detail?.referenceUrl||''));
  entry.append(description,open);container.querySelector('#filters').after(entry);
  form.onsubmit=async event=>{
-  event.preventDefault();if(busy||!form.reportValidity())return;
+  event.preventDefault();if(busy)return;if(await checkAvailability())return;if(!form.reportValidity())return;
   busy=true;const submit=form.querySelector('[type=submit]');submit.disabled=true;status.textContent='Enviando sua solicitação…';
   try{
    const root=webApiRoot(),options={credentials:'same-origin',cache:'no-store'};
@@ -45,6 +75,7 @@ export function setupTitleRequests(container){
    const body=Object.fromEntries(new FormData(form));body.consent=form.elements.consent.checked;
    const response=await fetch(root+'/title-requests',{...options,method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':data.csrf_token},body:JSON.stringify(body)});
    if(!response.ok){
+    if(response.status===409){const existing=await response.json();if(existing.error==='title_already_available'){showAvailable(existing.matches||[]);status.textContent='Esta série já está disponível. Abra o título acima para comprar e assistir.';return;}}
     if(response.status===429)throw Error('limit');
     if(response.status>=500)throw Error('unavailable');
     if(response.status===403)throw Error('csrf_failed');
@@ -66,7 +97,7 @@ export function setupTitleRequests(container){
    const field={invalid_phone:'phone',invalid_title:'title',invalid_reference:'reference_url',consent_required:'consent'}[error.message];
    if(field)form.elements[field].focus();
   }
-  finally{busy=false;submit.disabled=false;}
+  finally{busy=false;submit.disabled=exactAvailable;}
  };
  window.addEventListener('hashchange',()=>{if(dialog.open)close();});
 }

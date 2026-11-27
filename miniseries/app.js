@@ -4,7 +4,7 @@ import {createHome} from "./home.js?v=20261122-watch-search-newest-v3";
 import {emptyCorrections,fetchCorrections,applyCorrections} from "./language-overrides.js?v=20261122-watch-search-newest-v3";
 import {createWebAccount,webRequest} from "./web-account.js?v=20261124-channel-prices";
 import {createStorefrontHome} from './storefront-home.js?v=20261122-watch-search-newest-v3';
-import {setupTitleRequests} from './title-requests.js?v=20261122-watch-search-newest-v3';
+import {setupTitleRequests} from './title-requests.js?v=20261127-request-availability';
 const $ = selector => document.querySelector(selector);
 const BATCH = 36;
 let index = null, byId = null, indexPromise = null, manifestPromise = null;
